@@ -36,12 +36,7 @@
 #include "omx_jpeg_ext.h"
 #include "mm_omx_jpeg_encoder.h"
 
-#define HW_ENCODE
-#ifdef HW_ENCODE
 static uint8_t hw_encode = true;
-#else
-static uint8_t hw_encode = false;
-#endif
 
 static int jpegRotation = 0;
 static int isZSLMode = 0;
@@ -272,10 +267,11 @@ int8_t omxJpegOpen()
     return TRUE;
 }
 
-int8_t omxJpegStart()
+int8_t omxJpegStart(uint8_t hw_encode_enable)
 {
     ALOGE("%s", __func__);
     pthread_mutex_lock(&jpege_mutex);
+    hw_encode = hw_encode_enable;
     callbacks.EmptyBufferDone = etbdone;
     callbacks.FillBufferDone = ftbdone;
     callbacks.EventHandler = eventHandler;

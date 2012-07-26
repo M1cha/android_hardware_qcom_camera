@@ -375,8 +375,9 @@ typedef enum {
     MM_CAMERA_PARM_CH_INTERFACE,
     //or single output enabled to differentiate 7x27a with others
     MM_CAMERA_PARM_BESTSHOT_RECONFIGURE,
-    MM_CAMERA_MAX_NUM_FACES_DECT,
+    MM_CAMERA_PARM_MAX_NUM_FACES_DECT,
     MM_CAMERA_PARM_FPS_RANGE,
+    MM_CAMERA_PARM_FACIAL_FEATURE_INFO,
     MM_CAMERA_PARM_MAX
 } mm_camera_parm_type_t;
 
@@ -517,6 +518,7 @@ typedef enum {
   CAMERA_GET_MAX_NUM_FACES_DECT,
   CAMERA_SET_CHANNEL_STREAM,
   CAMERA_GET_CHANNEL_STREAM,
+  CAMERA_GET_FACIAL_FEATURE_INFO,
   CAMERA_CTRL_PARM_MAX
 } cam_ctrl_type;
 
@@ -581,6 +583,10 @@ typedef enum {
   CAMERA_ISO_MAX
 } camera_iso_mode_type;
 
+typedef enum {
+  MM_CAMERA_FACIAL_FEATURE_FD, // facial detection
+  MM_CAMERA_FACIAL_FEATURE_MAX
+} camera_facial_features;
 
 typedef enum {
   AEC_ROI_OFF,
@@ -824,6 +830,11 @@ typedef enum {
   FD_ROI_TYPE_HEADER,
   FD_ROI_TYPE_DATA
 } fd_roi_type_t;
+
+typedef struct {
+  int fd_mode;
+  int num_fd;
+} fd_set_parm_t;
 
 typedef struct {
   uint32_t frame_id;

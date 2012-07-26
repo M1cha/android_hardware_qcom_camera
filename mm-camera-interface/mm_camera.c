@@ -314,7 +314,7 @@ int32_t mm_camera_set_general_parm(mm_camera_obj_t * my_obj, mm_camera_parm_t *p
                     CAMERA_SET_SCE_FACTOR, sizeof(int32_t), (void *)parm->p_value);
     case MM_CAMERA_PARM_FD:
         return mm_camera_send_native_ctrl_cmd(my_obj,
-                    CAMERA_SET_PARM_FD, sizeof(int32_t), (void *)parm->p_value);
+                    CAMERA_SET_PARM_FD, sizeof(fd_set_parm_t), (void *)parm->p_value);
     case MM_CAMERA_PARM_AEC_LOCK:
         return mm_camera_send_native_ctrl_cmd(my_obj,
                     CAMERA_SET_AEC_LOCK, sizeof(int32_t), (void *)parm->p_value);
@@ -638,11 +638,20 @@ int32_t mm_camera_get_parm(mm_camera_obj_t * my_obj,
     case MM_CAMERA_PARM_VFE_OUTPUT_ENABLE:
         *((int *)parm->p_value) = my_obj->properties.vfe_output_enable;
         break;
+
     case MM_CAMERA_PARM_CH_INTERFACE:
         rc = mm_camera_send_native_ctrl_cmd(my_obj,
                   CAMERA_GET_CHANNEL_STREAM, sizeof(uint32_t), (void *)parm->p_value);
         my_obj->channel_interface_mask = *((uint32_t *)(parm->p_value));
         break;
+
+    case MM_CAMERA_PARM_MAX_NUM_FACES_DECT:
+        return mm_camera_send_native_ctrl_cmd(my_obj, CAMERA_GET_MAX_NUM_FACES_DECT,
+                     sizeof(int), (void *)parm->p_value);
+    case MM_CAMERA_PARM_FACIAL_FEATURE_INFO:
+        return mm_camera_send_native_ctrl_cmd(my_obj, CAMERA_GET_FACIAL_FEATURE_INFO,
+                     sizeof(int), (void *)parm->p_value);
+
     default:
         /* needs to add more implementation */
         rc = -1;

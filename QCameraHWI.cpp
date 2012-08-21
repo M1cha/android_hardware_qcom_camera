@@ -1132,6 +1132,9 @@ status_t QCameraHardwareInterface::startPreview2()
         /* First check if the picture resolution is the same, if not, change it*/
         getPictureSize(&mPictureWidth, &mPictureHeight);
 
+        /* remember picture size required by ui */
+        mPictureWidth_ui = mPictureWidth;
+        mPictureHeight_ui = mPictureHeight;
         /* check if picture size is less than video size */
         if (mPictureWidth < dim.video_width ||
             mPictureHeight < dim.video_height) {

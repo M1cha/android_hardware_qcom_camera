@@ -689,6 +689,7 @@ private:
     QCameraStream       *mStreamRdi;
 
     cam_ctrl_dimension_t mDimension;
+    int  mPictureWidth_ui, mPictureHeight_ui;
     int  mPreviewWidth, mPreviewHeight;
     int  videoWidth, videoHeight;
     int  thumbnailWidth, thumbnailHeight;

@@ -795,8 +795,8 @@ void QCameraHardwareInterface::initDefaultParameters()
             mSupportedFpsRanges = new android::FPSRange[ALL_FPS_RANGES_COUNT];
 
             //min and max fps in android format
-            int minFps = (int)(mSensorFpsRange.min_fps * 1000);
-            int maxFps = (int)(mSensorFpsRange.max_fps * 1000);
+            int minFps = (int)(round(mSensorFpsRange.min_fps) * 1000);
+            int maxFps = (int)(round(mSensorFpsRange.max_fps) * 1000);
             int idx=0;
             //filter supported fps ranges according to sensor fps range
             for(int i=0; i<(int)ALL_FPS_RANGES_COUNT; i++) {
@@ -805,6 +805,10 @@ void QCameraHardwareInterface::initDefaultParameters()
                     idx++;
                 }
             }
+            if (idx > 0)
+                ALOGE("max sensor fps range after correction = (%f, %f)",
+                    allFpsRanges[idx-1].maxFPS,
+                    allFpsRanges[idx-1].minFPS);
             mSupportedFpsRangesCount = idx;
 
             mFpsRangesSupportedValues = create_fps_str(mSupportedFpsRanges, mSupportedFpsRangesCount);

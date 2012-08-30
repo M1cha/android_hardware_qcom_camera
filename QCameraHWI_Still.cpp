@@ -1877,7 +1877,8 @@ status_t QCameraStream_Snapshot::receiveRawPicture(mm_camera_ch_data_buf_t* recv
           notifyCb = NULL;
         }
 
-        //mStopCallbackLock.unlock();
+        mSnapshotDataCallingBack = 1;
+        mStopCallbackLock.unlock();
         if(!mHalCamCtrl->mShutterSoundPlayed) {
             notifyShutter(&crop, TRUE);
         }
@@ -1927,6 +1928,12 @@ status_t QCameraStream_Snapshot::receiveRawPicture(mm_camera_ch_data_buf_t* recv
           if (notifyCb) {
             notifyCb(CAMERA_MSG_RAW_IMAGE_NOTIFY, 0, 0, mHalCamCtrl->mCallbackCookie);
           }
+        }
+        mStopCallbackLock.lock();
+        mSnapshotDataCallingBack = 0;
+        if (mFreeSnapshotBufAfterDataCb) {
+          deInitBuffer();
+          mFreeSnapshotBufAfterDataCb = 0;
         }
         mStopCallbackLock.unlock();
     }
@@ -2139,6 +2146,8 @@ status_t QCameraStream_Snapshot::start(void) {
     ALOGV("%s: E", __func__);
 
     Mutex::Autolock lock(mStopCallbackLock);
+    mSnapshotDataCallingBack = 0;
+    mFreeSnapshotBufAfterDataCb = 0;
 
     /* Keep track of number of snapshots to take - in case of
        multiple snapshot/burst mode */
@@ -2288,7 +2297,13 @@ void QCameraStream_Snapshot::stop(void)
         }
 
         /* Depending upon current state, we'll need to allocate-deallocate-deinit*/
-        deInitBuffer();
+        if (mSnapshotDataCallingBack) {
+            mFreeSnapshotBufAfterDataCb = 1;
+        }
+        else {
+            mFreeSnapshotBufAfterDataCb = 0;
+            deInitBuffer();
+        }
     }
 
     if(mSnapshotFormat == PICTURE_FORMAT_RAW) {

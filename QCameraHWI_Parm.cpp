@@ -1199,8 +1199,13 @@ void QCameraHardwareInterface::initDefaultParameters()
     mParameters.set(QCameraParameters::KEY_QC_SKIN_TONE_ENHANCEMENT,
                     QCameraParameters::SKIN_TONE_ENHANCEMENT_DISABLE);
     mParameters.set("skinToneEnhancement", "0");
+    if(cam_config_is_parm_supported(mCameraId, MM_CAMERA_PARM_SCE_FACTOR)){
     mParameters.set(QCameraParameters::KEY_QC_SUPPORTED_SKIN_TONE_ENHANCEMENT_MODES,
                     mSkinToneEnhancementValues);
+    }else{
+    mParameters.set(QCameraParameters::KEY_QC_SUPPORTED_SKIN_TONE_ENHANCEMENT_MODES,
+                    NULL);
+    }
 
     //Set Scene Mode
     mParameters.set(QCameraParameters::KEY_SCENE_MODE,

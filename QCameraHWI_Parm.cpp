@@ -2555,6 +2555,8 @@ status_t QCameraHardwareInterface::setCameraMode(const QCameraParameters& params
 status_t QCameraHardwareInterface::setPowerMode(const QCameraParameters& params) {
     uint32_t value = NORMAL_POWER;
     const char *powermode = NULL;
+    int mNuberOfVFEOutputs;
+    bool ret;
 
     powermode = params.get(QCameraParameters::KEY_QC_POWER_MODE);
     if (powermode != NULL) {
@@ -2572,6 +2574,16 @@ status_t QCameraHardwareInterface::setPowerMode(const QCameraParameters& params)
         }
     }
 
+    ret = cam_config_get_parm(mCameraId, MM_CAMERA_PARM_VFE_OUTPUT_ENABLE, &mNuberOfVFEOutputs);
+    if(ret != MM_CAMERA_OK) {
+        ALOGE("get parm MM_CAMERA_PARM_VFE_OUTPUT_ENABLE  failed");
+        ret = BAD_VALUE;
+    }
+    if(mNuberOfVFEOutputs == 1) {
+       value = LOW_POWER;
+       mPowerMode = value;
+       mParameters.set(QCameraParameters::KEY_QC_POWER_MODE,"Low_Power");
+    }
     ALOGI("%s Low power mode %s value = %d", __func__,
           value ? "Enabled" : "Disabled", value);
     native_set_parms(MM_CAMERA_PARM_LOW_POWER_MODE, sizeof(value),

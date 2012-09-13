@@ -342,7 +342,7 @@ status_t QCameraStream_Rdi::processRdiFrame(
   cache_inv_data.handle = frame->def.frame->fd_data.handle;
   cache_inv_data.length = frame->def.frame->ion_alloc.len;
   ion_fd = frame->def.frame->ion_dev_fd;
-  
+
   if (mHalCamCtrl->cache_ops(ion_fd, &cache_inv_data, ION_IOC_CLEAN_CACHES) < 0)
     ALOGE("%s: Cache clean for RDI buffer %p fd = %d failed", __func__,
       cache_inv_data.vaddr, cache_inv_data.fd);
@@ -443,7 +443,7 @@ status_t QCameraStream_Rdi::start()
     //QCameraStream::start ();
     stream_info = mHalCamCtrl->getChannelInterface();
 
-    setFormat(MM_CAMERA_CH_RDI_MASK);
+    setFormat(MM_CAMERA_CH_RDI_MASK, (cam_format_t)0);
 
     initRdiBuffers();
     ret = cam_config_prepare_buf(mCameraId, &mRdiBuf);

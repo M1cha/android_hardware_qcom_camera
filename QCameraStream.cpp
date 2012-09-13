@@ -262,7 +262,7 @@ status_t QCameraStream::setMode(int enable) {
   return NO_ERROR;
 }
 
-status_t QCameraStream::setFormat(uint8_t ch_type_mask)
+status_t QCameraStream::setFormat(uint8_t ch_type_mask, cam_format_t previewFmt )
 {
     int rc = MM_CAMERA_OK;
     status_t ret = NO_ERROR;
@@ -285,9 +285,7 @@ status_t QCameraStream::setFormat(uint8_t ch_type_mask)
     memset(&fmt, 0, sizeof(mm_camera_ch_image_fmt_parm_t));
     if (MM_CAMERA_CH_PREVIEW_MASK & ch_type_mask){
         fmt.ch_type = MM_CAMERA_CH_PREVIEW;
-        ret = cam_config_get_parm(mCameraId,
-                  MM_CAMERA_PARM_PREVIEW_FORMAT, &preview_format);
-        fmt.def.fmt = (cam_format_t)preview_format;
+        fmt.def.fmt = (cam_format_t)previewFmt;
         fmt.def.dim.width = dim.display_width;
         fmt.def.dim.height =  dim.display_height;
     } else if (MM_CAMERA_CH_RDI_MASK & ch_type_mask){

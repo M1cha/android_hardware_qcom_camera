@@ -956,7 +956,7 @@ void  QCameraHardwareInterface::processEvent(mm_camera_event_t *event)
     app_notify_cb_t app_cb;
     ALOGV("processEvent: type :%d E",event->event_type);
     if(mPreviewState == QCAMERA_HAL_PREVIEW_STOPPED){
-	ALOGV("Stop recording issued. Return from process Event");
+	ALOGD("Stop recording issued. Return from process Event");
         return;
     }
     memset(&app_cb, 0, sizeof(app_notify_cb_t));
@@ -1063,7 +1063,7 @@ status_t QCameraHardwareInterface::startPreview()
         if(QCAMERA_HAL_PREVIEW_START == mPreviewState &&
            (mPreviewWindow || isNoDisplayMode() ||
                (getChannelInterface() == STREAM_RAW))) {
-            ALOGE("%s:  start preview now", __func__);
+            ALOGD("%s:  start preview now", __func__);
             retVal = startPreview2();
             if(retVal == NO_ERROR)
                 mPreviewState = QCAMERA_HAL_PREVIEW_STARTED;
@@ -1488,15 +1488,15 @@ void QCameraHardwareInterface::releaseRecordingFrame(const void *opaque)
 
 status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app_notify_cb_t *app_cb)
 {
-    ALOGV("autoFocusEvent: E");
+    ALOGD("autoFocusEvent: E");
     int ret = NO_ERROR;
 /************************************************************
   BEGIN MUTEX CODE
 *************************************************************/
 
-    ALOGV("%s:%d: Trying to acquire AF bit lock",__func__,__LINE__);
+    ALOGD("%s:%d: Trying to acquire AF bit lock",__func__,__LINE__);
     mAutofocusLock.lock();
-    ALOGV("%s:%d: Acquired AF bit lock",__func__,__LINE__);
+    ALOGD("%s:%d: Acquired AF bit lock",__func__,__LINE__);
 
     if(mAutoFocusRunning==false) {
       ALOGV("%s:AF not running, discarding stale event",__func__);
@@ -1531,7 +1531,7 @@ status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app
       variables' validity will be under question*/
 
     if (mNotifyCb && ( mMsgEnabled & CAMERA_MSG_FOCUS)){
-      ALOGE("%s:Issuing callback to service",__func__);
+      ALOGD("%s:Issuing callback to service",__func__);
 
       /* "Accepted" status is not appropriate it should be used for
         initial cmd, event reporting should only give use SUCCESS/FAIL
@@ -1542,7 +1542,7 @@ status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app
       app_cb->argm_notify.ext2 = 0;
       app_cb->argm_notify.cookie =  mCallbackCookie;
 
-      ALOGE("Auto foucs state =%d", *status);
+      ALOGD("Auto foucs state =%d", *status);
       if(*status==CAM_CTRL_SUCCESS) {
         app_cb->argm_notify.ext1 = true;
       }
@@ -1559,7 +1559,7 @@ status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app
       ALOGE("%s:Call back not enabled",__func__);
     }
 
-    ALOGE("autoFocusEvent: X");
+    ALOGD("autoFocusEvent: X");
     return ret;
 
 }

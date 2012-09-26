@@ -1488,15 +1488,15 @@ void QCameraHardwareInterface::releaseRecordingFrame(const void *opaque)
 
 status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app_notify_cb_t *app_cb)
 {
-    ALOGD("autoFocusEvent: E");
+    ALOGV("autoFocusEvent: E");
     int ret = NO_ERROR;
 /************************************************************
   BEGIN MUTEX CODE
 *************************************************************/
 
-    ALOGD("%s:%d: Trying to acquire AF bit lock",__func__,__LINE__);
+    ALOGV("%s:%d: Trying to acquire AF bit lock",__func__,__LINE__);
     mAutofocusLock.lock();
-    ALOGD("%s:%d: Acquired AF bit lock",__func__,__LINE__);
+    ALOGV("%s:%d: Acquired AF bit lock",__func__,__LINE__);
 
     if(mAutoFocusRunning==false) {
       ALOGV("%s:AF not running, discarding stale event",__func__);

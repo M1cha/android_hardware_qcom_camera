@@ -2739,4 +2739,3 @@ void QCameraHardwareInterface::pausePreviewForZSL()
     }
 }
 }; // namespace android
-

@@ -27,7 +27,6 @@
 
 #include "QCameraStream.h"
 
-
 #define LIKELY(exp)   __builtin_expect(!!(exp), 1)
 #define UNLIKELY(exp) __builtin_expect(!!(exp), 0)
 
@@ -190,7 +189,7 @@ status_t QCameraStream_record::start()
     ret = BAD_VALUE;
     goto error;
   }else{
-    ALOGE("%s : Video streaming Started",__func__);
+    ALOGV("%s : Video streaming Started",__func__);
     ret = NO_ERROR;
   }
   mActive = true;
@@ -411,7 +410,7 @@ status_t QCameraStream_record::initEncodeBuffers()
 
   buf_cnt = VIDEO_BUFFER_COUNT;
   if(mHalCamCtrl->isLowPowerCamcorder()) {
-    ALOGE("%s: lower power camcorder selected", __func__);
+    ALOGV("%s: lower power camcorder selected", __func__);
     buf_cnt = VIDEO_BUFFER_COUNT_LOW_POWER_CAMCORDER;
   }
     recordframes = new msm_frame[buf_cnt];
@@ -488,7 +487,7 @@ status_t QCameraStream_record::initEncodeBuffers()
         CAM_SOCK_MSG_TYPE_FD_MAPPING))
         ALOGE("%s: sending mapping data Msg Failed", __func__);
 
-      ALOGE ("initRecord :  record heap , video buffers  buffer=%lu fd=%d y_off=%d cbcr_off=%d\n",
+      ALOGV("initRecord :  record heap , video buffers  buffer=%lu fd=%d y_off=%d cbcr_off=%d\n",
 		    (unsigned long)recordframes[cnt].buffer, recordframes[cnt].fd, recordframes[cnt].y_off,
 		    recordframes[cnt].cbcr_off);
 	    //mNumRecordFrames++;
@@ -565,7 +564,7 @@ void QCameraStream_record::debugShowVideoFPS() const
   nsecs_t diff = now - mLastFpsTime;
   if (diff > ms2ns(250)) {
     mFps =  ((mFrameCount - mLastFrameCount) * float(s2ns(1))) / diff;
-    ALOGI("Video Frames Per Second: %.4f", mFps);
+    ALOGV("Video Frames Per Second: %.4f", mFps);
     mLastFpsTime = now;
     mLastFrameCount = mFrameCount;
   }

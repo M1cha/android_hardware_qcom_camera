@@ -253,7 +253,7 @@ status_t QCameraStream::deinitChannel(int cameraId,
 }
 
 status_t QCameraStream::setMode(int enable) {
-  ALOGE("%s :myMode %x ", __func__, myMode);
+  ALOGV("%s :myMode %x ", __func__, myMode);
   if (enable) {
       myMode = (camera_mode_t)(myMode | CAMERA_ZSL_MODE);
   } else {

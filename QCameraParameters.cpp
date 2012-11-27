@@ -57,6 +57,8 @@ const char QCameraParameters::KEY_SUPPORTED_HDR_IMAGING_MODES[] = "hdr-values";
 const char QCameraParameters::KEY_POWER_MODE_SUPPORTED[] = "power-mode-supported";
 const char QCameraParameters::KEY_ZSL[] = "zsl";
 const char QCameraParameters::KEY_SUPPORTED_ZSL_MODES[] = "zsl-values";
+const char QCameraParameters::KEY_QC_VIDEO_HDR[] = "video-hdr";
+const char QCameraParameters::KEY_QC_SUPPORTED_VIDEO_HDR_MODES[] = "video-hdr-values";
 const char QCameraParameters::KEY_CAMERA_MODE[] = "camera-mode";
 const char QCameraParameters::KEY_AE_BRACKET_HDR[] = "ae-bracket-hdr";
 const char QCameraParameters::KEY_POWER_MODE[] = "power-mode";
@@ -174,6 +176,10 @@ const char QCameraParameters::HDR_DISABLE[] = "disable";
 // Values for ZSL settings.
 const char QCameraParameters::ZSL_OFF[] = "off";
 const char QCameraParameters::ZSL_ON[] = "on";
+
+// Values for VIDEOHDR settings.
+const char QCameraParameters::VIDEO_HDR_OFF[] = "off";
+const char QCameraParameters::VIDEO_HDR_ON[] = "on";
 
 // Values for HDR Bracketing settings.
 const char QCameraParameters::AE_BRACKET_HDR_OFF[] = "Off";

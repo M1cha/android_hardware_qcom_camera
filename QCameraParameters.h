@@ -101,6 +101,8 @@ public:
 
     static const char KEY_ZSL[];
     static const char KEY_SUPPORTED_ZSL_MODES[];
+    static const char KEY_QC_VIDEO_HDR[];
+    static const char KEY_QC_SUPPORTED_VIDEO_HDR_MODES[];
 
     static const char KEY_CAMERA_MODE[];
 
@@ -210,6 +212,10 @@ public:
     // Values for ZSL settings.
     static const char ZSL_OFF[];
     static const char ZSL_ON[];
+
+    // Values for HDR settings
+    static const char VIDEO_HDR_OFF[];
+    static const char VIDEO_HDR_ON[];
 
     // Values for HDR Bracketing settings.
     static const char AE_BRACKET_HDR_OFF[];

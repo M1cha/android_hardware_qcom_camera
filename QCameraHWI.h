@@ -547,6 +547,7 @@ private:
     bool supportsSelectableZoneAf();
     bool supportsFaceDetection();
     bool supportsRedEyeReduction();
+    bool supportsVideoHDR();
     bool preview_parm_config (cam_ctrl_dimension_t* dim,QCameraParameters& parm);
 
     void stopPreviewInternal();
@@ -613,6 +614,7 @@ private:
     status_t setOverlayFormats(const QCameraParameters& params);
     status_t setHighFrameRate(const QCameraParameters& params);
     status_t setRedeyeReduction(const QCameraParameters& params);
+    status_t setVideoHDR(const QCameraParameters& params);
     status_t setAEBracket(const QCameraParameters& params);
     status_t setFaceDetect(const QCameraParameters& params);
     status_t setDenoise(const QCameraParameters& params);
@@ -751,6 +753,8 @@ private:
     bool mReleasedRecordingFrame;
     bool mStateLiveshot;
     int mHdrMode;
+    int mVideoHdrMode;
+    bool mVideoHDRMode;
     int mSnapshotFormat;
     int mZslInterval;
     bool mRestartPreview;
@@ -800,6 +804,7 @@ private:
     String8 mFpsRangesSupportedValues;
     String8 mZslValues;
     String8 mFocusDistance;
+    String8 mVideoHdrValues;
 
     friend class QCameraStream;
     friend class QCameraStream_record;

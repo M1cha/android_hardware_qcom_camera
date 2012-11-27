@@ -343,6 +343,9 @@ int32_t mm_camera_set_general_parm(mm_camera_obj_t * my_obj, mm_camera_parm_t *p
     case MM_CAMERA_PARM_REDEYE_REDUCTION:
         return mm_camera_send_native_ctrl_cmd(my_obj,
                     CAMERA_SET_REDEYE_REDUCTION, sizeof(int32_t), (void *)parm->p_value);
+    case MM_CAMERA_PARM_VIDEO_HDR:
+        return mm_camera_send_native_ctrl_cmd(my_obj,
+                    CAMERA_SET_VIDEO_HDR, sizeof(int32_t), (void *)parm->p_value);
     case MM_CAMERA_PARM_WAVELET_DENOISE:
         return mm_camera_send_native_ctrl_cmd(my_obj,
                     CAMERA_SET_PARM_WAVELET_DENOISE, sizeof(denoise_param_t), (void *)parm->p_value);

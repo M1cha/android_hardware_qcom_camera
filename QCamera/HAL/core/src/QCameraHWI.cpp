@@ -3948,6 +3948,21 @@ bool QCameraHardwareInterface::isNoDisplayMode()
   return (mNoDisplayMode != 0);
 }
 
+void QCameraHardwareInterface::restartPreview()
+{
+    ALOGV("%s: E mPreviewState = %d", __func__, mPreviewState);
+    if (QCAMERA_HAL_PREVIEW_STARTED == mPreviewState) {
+        stopPreviewInternal();
+        // start preview again
+        mPreviewState = QCAMERA_HAL_PREVIEW_START;
+        if (startPreview2() == NO_ERROR)
+            mPreviewState = QCAMERA_HAL_PREVIEW_STARTED;
+        else
+            mPreviewState = QCAMERA_HAL_PREVIEW_STOPPED;
+    }
+    ALOGV("%s: X mPreviewState = %d", __func__, mPreviewState);
+}
+
 void QCameraHardwareInterface::pausePreviewForZSL()
 {
     if(mRestartPreview) {

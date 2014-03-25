@@ -671,6 +671,7 @@ private:
     status_t restartRdiForHdr();
     //status_t startPreviewZSL();
     void pausePreviewForSnapshot();
+    void restartPreview();
     void pausePreviewForZSL();
     void snapshot_buf_done(mm_camera_super_buf_t* src_frame);
 

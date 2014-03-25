@@ -1474,6 +1474,7 @@ status_t QCameraHardwareInterface::setParameters(const QCameraParameters& params
     status_t ret = NO_ERROR;
     uint8_t supported;
 
+    mRestartPreview = false;
     ALOGI("%s: E", __func__);
 //    Mutex::Autolock l(&mLock);
     status_t rc, final_rc = NO_ERROR;
@@ -1613,6 +1614,13 @@ status_t QCameraHardwareInterface::setParameters(const QCameraParameters& params
 
    if (mInitSetting == true)
      mInitSetting = false;
+
+    if (mRestartPreview) {
+        ALOGI("%s: need to restart preview", __func__);
+        restartPreview();
+        mRestartPreview = false;
+    }
+
    ALOGI("%s: X", __func__);
    return final_rc;
 }

@@ -129,7 +129,7 @@ static thumbnail_size_type thumbnail_sizes[] = {
 };
 
 static struct camera_size_type zsl_picture_sizes[] = {
-  { 1024, 768}, // 1MP XGA
+  { 1280, 960}, // 1.3MP
   { 800, 600}, //SVGA
   { 800, 480}, // WVGA
   { 640, 480}, // VGA
@@ -140,18 +140,19 @@ static struct camera_size_type zsl_picture_sizes[] = {
 
 static camera_size_type default_picture_sizes[] = {
   { 4000, 3000}, // 12MP
-  { 3200, 2400}, // 8MP
+  { 3264, 2448}, // 8MP
+  { 3264, 1836}, // Picture Size to match 1080p,720p AR
+  { 3264, 2176}, // Picture Size to match 480p AR
   { 2592, 1944}, // 5MP
   { 2048, 1536}, // 3MP QXGA
-  { 1920, 1088}, //HD1080
+  { 1920, 1080}, // HD1080
   { 1600, 1200}, // 2MP UXGA
-  { 1280, 768}, //WXGA
-  { 1280, 720}, //HD720
-  { 1024, 768}, // 1MP XGA
-  { 800, 600}, //SVGA
+  { 1280, 960}, // 1.3MP
+  { 1280, 720},
+  { 720, 480},
   { 800, 480}, // WVGA
   { 640, 480}, // VGA
-  { 352, 288}, //CIF
+  { 352, 288}, // CIF
   { 320, 240}, // QVGA
   { 176, 144} // QCIF
 };
@@ -161,7 +162,7 @@ static int iso_speed_values[] = {
 };
 
 extern int HAL_numOfCameras;
-extern camera_info_t HAL_cameraInfo[MSM_MAX_CAMERA_SENSORS];
+extern qcamera_info_t HAL_cameraInfo[MSM_MAX_CAMERA_SENSORS];
 extern mm_camera_t * HAL_camerahandle[MSM_MAX_CAMERA_SENSORS];
 
 namespace android {

@@ -2387,17 +2387,12 @@ status_t QCameraHardwareInterface::sendUnMappingBuf(int ext_mode, int idx, int c
     return NO_ERROR;
 }
 
-int QCameraHardwareInterface::allocate_ion_memory(
-  QCameraHalHeap_t *p_camera_memory, int cnt, int ion_type, int caching_type)
+int QCameraHardwareInterface::allocate_ion_memory(QCameraHalHeap_t *p_camera_memory, int cnt, int ion_type)
 {
   int rc = 0;
   struct ion_handle_data handle_data;
 
-  if (caching_type == CACHED) {
-      p_camera_memory->main_ion_fd[cnt] = open("/dev/ion", O_RDONLY);
-  } else {
-      p_camera_memory->main_ion_fd[cnt] = open("/dev/ion", O_RDONLY | O_DSYNC);
-  }
+  p_camera_memory->main_ion_fd[cnt] = open("/dev/ion", O_RDONLY);
   if (p_camera_memory->main_ion_fd[cnt] < 0) {
     ALOGE("Ion dev open failed\n");
     ALOGE("Error is %s\n", strerror(errno));
@@ -2407,7 +2402,8 @@ int QCameraHardwareInterface::allocate_ion_memory(
   /* to make it page size aligned */
   p_camera_memory->alloc[cnt].len = (p_camera_memory->alloc[cnt].len + 4095) & (~4095);
   p_camera_memory->alloc[cnt].align = 4096;
-  p_camera_memory->alloc[cnt].flags = ion_type;
+  p_camera_memory->alloc[cnt].flags = ION_FLAG_CACHED;
+  p_camera_memory->alloc[cnt].heap_id_mask = ion_type;
 
   rc = ioctl(p_camera_memory->main_ion_fd[cnt], ION_IOC_ALLOC, &p_camera_memory->alloc[cnt]);
   if (rc < 0) {
@@ -2463,7 +2459,8 @@ int QCameraHardwareInterface::allocate_ion_memory(QCameraStatHeap_t *p_camera_me
   /* to make it page size aligned */
   p_camera_memory->alloc[cnt].len = (p_camera_memory->alloc[cnt].len + 4095) & (~4095);
   p_camera_memory->alloc[cnt].align = 4096;
-  p_camera_memory->alloc[cnt].flags = (0x1 << ion_type | 0x1 << ION_IOMMU_HEAP_ID);
+  p_camera_memory->alloc[cnt].flags = ION_FLAG_CACHED;
+  p_camera_memory->alloc[cnt].heap_id_mask = (0x1 << ion_type | 0x1 << ION_IOMMU_HEAP_ID);
 
   rc = ioctl(p_camera_memory->main_ion_fd[cnt], ION_IOC_ALLOC, &p_camera_memory->alloc[cnt]);
   if (rc < 0) {
@@ -2494,8 +2491,11 @@ int QCameraHardwareInterface::cache_ops(int ion_fd,
   struct ion_flush_data *cache_data, int type)
 {
   int rc = 0;
+  struct ion_custom_data data;
+  data.cmd = type;
+  data.arg = (unsigned long)cache_data;
 
-  rc = ioctl(ion_fd, type, cache_data);
+  rc = ioctl(ion_fd, ION_IOC_CUSTOM, &data);
   if (rc < 0)
     ALOGE("%s: Cache Invalidate failed\n", __func__);
   else
@@ -2533,7 +2533,9 @@ int QCameraHardwareInterface::initHeapMem( QCameraHalHeap_t *heap,
     int rc = 0;
     int i;
     int path;
+    int ion_fd;
     struct msm_frame *frame;
+    struct ion_flush_data cache_inv_data;
     ALOGV("Init Heap =%p. stream_buf =%p, pmem_type =%d, num_of_buf=%d. buf_len=%d, cbcr_off=%d",
          heap, StreamBuf, pmem_type, num_of_buf, buf_len, cbcr_off);
     if(num_of_buf > MM_CAMERA_MAX_NUM_FRAMES || heap == NULL ||
@@ -2576,17 +2578,14 @@ int QCameraHardwareInterface::initHeapMem( QCameraHalHeap_t *heap,
 #ifdef USE_ION
       if (isZSLMode())
         rc = allocate_ion_memory(heap, i, ((0x1 << CAMERA_ZSL_ION_HEAP_ID) |
-         (0x1 << CAMERA_ZSL_ION_FALLBACK_HEAP_ID)), CACHED);
+         (0x1 << CAMERA_ZSL_ION_FALLBACK_HEAP_ID)));
       else
         rc = allocate_ion_memory(heap, i, ((0x1 << CAMERA_ION_HEAP_ID) |
-         (0x1 << CAMERA_ION_FALLBACK_HEAP_ID)), CACHED);
+         (0x1 << CAMERA_ION_FALLBACK_HEAP_ID)));
 
       if (rc < 0) {
-        ALOGE("%sION allocation failed..fallback to ashmem\n", __func__);
-        if ( pmem_type == MSM_PMEM_MAX ) {
-                heap->fd[i] = -1;
-                rc = 1;
-        }
+        ALOGE("%s: ION allocation failed\n", __func__);
+        break;
       }
 #else
         if (pmem_type == MSM_PMEM_MAX)
@@ -2607,6 +2606,21 @@ int QCameraHardwareInterface::initHeapMem( QCameraHalHeap_t *heap,
             rc = -1;
             break;
         }
+
+        memset(&cache_inv_data, 0, sizeof(struct ion_flush_data));
+        cache_inv_data.vaddr = (void*) heap->camera_memory[i]->data;
+        cache_inv_data.fd = heap->ion_info_fd[i].fd;
+        cache_inv_data.handle = heap->ion_info_fd[i].handle;
+        cache_inv_data.length = heap->alloc[i].len;
+        ion_fd = heap->main_ion_fd[i];
+        if(ion_fd > 0) {
+            if(cache_ops(ion_fd, &cache_inv_data, ION_IOC_CLEAN_INV_CACHES) < 0)
+                ALOGE("%s: Cache Invalidate failed\n", __func__);
+            else {
+                ALOGV("%s: Successful cache invalidate\n", __func__);
+            }
+        }
+
         if (StreamBuf != NULL) {
             frame = &(StreamBuf->frame[i]);
             memset(frame, 0, sizeof(struct msm_frame));

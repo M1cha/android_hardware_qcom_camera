@@ -29,9 +29,6 @@
 #include <fcntl.h>
 #include <cutils/properties.h>
 #include <math.h>
-#if HAVE_ANDROID_OS
-#include <linux/android_pmem.h>
-#endif
 #include <linux/ioctl.h>
 #include "QCameraParameters.h"
 #include <media/mediarecorder.h>
@@ -60,7 +57,7 @@ extern "C" {
 #include <sys/system_properties.h>
 #include <sys/time.h>
 #include <stdlib.h>
-#include <linux/ion.h>
+#include <linux/msm_ion.h>
 
 } // extern "C"
 

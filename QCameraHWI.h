@@ -36,8 +36,7 @@
 #include <QComOMXMetadata.h>
 
 extern "C" {
-#include <linux/android_pmem.h>
-#include <linux/ion.h>
+#include <linux/msm_ion.h>
 #include <mm_camera_interface2.h>
 #include "mm_omx_jpeg_encoder.h"
 } //extern C
@@ -474,7 +473,7 @@ public:
       mm_camera_socket_msg_type msg_type);
 
     int allocate_ion_memory(QCameraHalHeap_t *p_camera_memory, int cnt,
-      int ion_type, int caching_type);
+      int ion_type);
     int deallocate_ion_memory(QCameraHalHeap_t *p_camera_memory, int cnt);
 
     int allocate_ion_memory(QCameraStatHeap_t *p_camera_memory, int cnt,

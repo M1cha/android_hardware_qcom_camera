@@ -52,90 +52,90 @@ public:
 
     // Supported PREVIEW/RECORDING SIZES IN HIGH FRAME RATE recording, sizes in pixels.
     // Example value: "800x480,432x320". Read only.
-    static const char KEY_QC_SUPPORTED_HFR_SIZES[];
+    static const char KEY_SUPPORTED_HFR_SIZES[];
     // The mode of preview frame rate.
     // Example value: "frame-rate-auto, frame-rate-fixed".
-    static const char KEY_QC_PREVIEW_FRAME_RATE_MODE[];
-    static const char KEY_QC_SUPPORTED_PREVIEW_FRAME_RATE_MODES[];
-    static const char KEY_QC_PREVIEW_FRAME_RATE_AUTO_MODE[];
-    static const char KEY_QC_PREVIEW_FRAME_RATE_FIXED_MODE[];
+    static const char KEY_PREVIEW_FRAME_RATE_MODE[];
+    static const char KEY_SUPPORTED_PREVIEW_FRAME_RATE_MODES[];
+    static const char KEY_PREVIEW_FRAME_RATE_AUTO_MODE[];
+    static const char KEY_PREVIEW_FRAME_RATE_FIXED_MODE[];
 
-    static const char KEY_QC_SKIN_TONE_ENHANCEMENT[] ;
-    static const char KEY_QC_SUPPORTED_SKIN_TONE_ENHANCEMENT_MODES[] ;
+    static const char KEY_SKIN_TONE_ENHANCEMENT[] ;
+    static const char KEY_SUPPORTED_SKIN_TONE_ENHANCEMENT_MODES[] ;
 
     //Touch Af/AEC settings.
-    static const char KEY_QC_TOUCH_AF_AEC[];
-    static const char KEY_QC_SUPPORTED_TOUCH_AF_AEC[];
+    static const char KEY_TOUCH_AF_AEC[];
+    static const char KEY_SUPPORTED_TOUCH_AF_AEC[];
     //Touch Index for AEC.
-    static const char KEY_QC_TOUCH_INDEX_AEC[];
+    static const char KEY_TOUCH_INDEX_AEC[];
     //Touch Index for AF.
-    static const char KEY_QC_TOUCH_INDEX_AF[];
+    static const char KEY_TOUCH_INDEX_AF[];
     // Current auto scene detection mode.
     // Example value: "off" or SCENE_DETECT_XXX constants. Read/write.
-    static const char KEY_QC_SCENE_DETECT[];
+    static const char KEY_SCENE_DETECT[];
     // Supported auto scene detection settings.
     // Example value: "off,backlight,snow/cloudy". Read only.
-    static const char KEY_QC_SUPPORTED_SCENE_DETECT[];
+    static const char KEY_SUPPORTED_SCENE_DETECT[];
 	   // Returns true if video snapshot is supported. That is, applications
-    static const char KEY_QC_FULL_VIDEO_SNAP_SUPPORTED[];
-    static const char KEY_QC_POWER_MODE_SUPPORTED[];
+    static const char KEY_FULL_VIDEO_SNAP_SUPPORTED[];
+    static const char KEY_POWER_MODE_SUPPORTED[];
 
-    static const char KEY_QC_ISO_MODE[];
-    static const char KEY_QC_SUPPORTED_ISO_MODES[];
-    static const char KEY_QC_LENSSHADE[] ;
-    static const char KEY_QC_SUPPORTED_LENSSHADE_MODES[] ;
+    static const char KEY_ISO_MODE[];
+    static const char KEY_SUPPORTED_ISO_MODES[];
+    static const char KEY_LENSSHADE[] ;
+    static const char KEY_SUPPORTED_LENSSHADE_MODES[] ;
 
-    static const char KEY_QC_AUTO_EXPOSURE[];
-    static const char KEY_QC_SUPPORTED_AUTO_EXPOSURE[];
+    static const char KEY_AUTO_EXPOSURE[];
+    static const char KEY_SUPPORTED_AUTO_EXPOSURE[];
 
-    static const char KEY_QC_GPS_LATITUDE_REF[];
-    static const char KEY_QC_GPS_LONGITUDE_REF[];
-    static const char KEY_QC_GPS_ALTITUDE_REF[];
-    static const char KEY_QC_GPS_STATUS[];
-    static const char KEY_QC_EXIF_DATETIME[];
-    static const char KEY_QC_MEMORY_COLOR_ENHANCEMENT[];
-    static const char KEY_QC_SUPPORTED_MEM_COLOR_ENHANCE_MODES[];
+    static const char KEY_GPS_LATITUDE_REF[];
+    static const char KEY_GPS_LONGITUDE_REF[];
+    static const char KEY_GPS_ALTITUDE_REF[];
+    static const char KEY_GPS_STATUS[];
+    static const char KEY_EXIF_DATETIME[];
+    static const char KEY_MEMORY_COLOR_ENHANCEMENT[];
+    static const char KEY_SUPPORTED_MEM_COLOR_ENHANCE_MODES[];
 
 
-    static const char KEY_QC_POWER_MODE[];
+    static const char KEY_POWER_MODE[];
 
-    static const char KEY_QC_ZSL[];
-    static const char KEY_QC_SUPPORTED_ZSL_MODES[];
+    static const char KEY_ZSL[];
+    static const char KEY_SUPPORTED_ZSL_MODES[];
 
-    static const char KEY_QC_CAMERA_MODE[];
+    static const char KEY_CAMERA_MODE[];
 
-    static const char KEY_QC_VIDEO_HIGH_FRAME_RATE[];
-    static const char KEY_QC_SUPPORTED_VIDEO_HIGH_FRAME_RATE_MODES[];
-    static const char KEY_QC_HIGH_DYNAMIC_RANGE_IMAGING[];
-    static const char KEY_QC_SUPPORTED_HDR_IMAGING_MODES[];
-    static const char KEY_QC_AE_BRACKET_HDR[];
+    static const char KEY_VIDEO_HIGH_FRAME_RATE[];
+    static const char KEY_SUPPORTED_VIDEO_HIGH_FRAME_RATE_MODES[];
+    static const char KEY_HIGH_DYNAMIC_RANGE_IMAGING[];
+    static const char KEY_SUPPORTED_HDR_IMAGING_MODES[];
+    static const char KEY_AE_BRACKET_HDR[];
 
 
     // DENOISE
-    static const char KEY_QC_DENOISE[];
-    static const char KEY_QC_SUPPORTED_DENOISE[];
+    static const char KEY_DENOISE[];
+    static const char KEY_SUPPORTED_DENOISE[];
 
     //Selectable zone AF.
-    static const char KEY_QC_SELECTABLE_ZONE_AF[];
-    static const char KEY_QC_SUPPORTED_SELECTABLE_ZONE_AF[];
+    static const char KEY_SELECTABLE_ZONE_AF[];
+    static const char KEY_SUPPORTED_SELECTABLE_ZONE_AF[];
 
     //Face Detection
-    static const char KEY_QC_FACE_DETECTION[];
-    static const char KEY_QC_SUPPORTED_FACE_DETECTION[];
+    static const char KEY_FACE_DETECTION[];
+    static const char KEY_SUPPORTED_FACE_DETECTION[];
 
     // supported camera features to be queried by Snapdragon SDK
     //Read only
-    static const char KEY_QC_SUPPORTED_CAMERA_FEATURES[];
+    static const char KEY_SUPPORTED_CAMERA_FEATURES[];
 
     //Indicates number of faces requested by the application.
     //This value will be rejected if the requested faces
     //greater than supported by hardware.
     //Write only.
-    static const char KEY_QC_MAX_NUM_REQUESTED_FACES[];
+    static const char KEY_MAX_NUM_REQUESTED_FACES[];
 
     //Redeye Reduction
-    static const char KEY_QC_REDEYE_REDUCTION[];
-    static const char KEY_QC_SUPPORTED_REDEYE_REDUCTION[];
+    static const char KEY_REDEYE_REDUCTION[];
+    static const char KEY_SUPPORTED_REDEYE_REDUCTION[];
     static const char EFFECT_EMBOSS[];
     static const char EFFECT_SKETCH[];
     static const char EFFECT_NEON[];
@@ -172,15 +172,15 @@ public:
     static const char AUTO_EXPOSURE_CENTER_WEIGHTED[];
     static const char AUTO_EXPOSURE_SPOT_METERING[];
 
-    static const char KEY_QC_SHARPNESS[];
-    static const char KEY_QC_MAX_SHARPNESS[];
-    static const char KEY_QC_CONTRAST[];
-    static const char KEY_QC_MAX_CONTRAST[];
-    static const char KEY_QC_SATURATION[];
-    static const char KEY_QC_MAX_SATURATION[];
+    static const char KEY_SHARPNESS[];
+    static const char KEY_MAX_SHARPNESS[];
+    static const char KEY_CONTRAST[];
+    static const char KEY_MAX_CONTRAST[];
+    static const char KEY_SATURATION[];
+    static const char KEY_MAX_SATURATION[];
 
-    static const char KEY_QC_HISTOGRAM[] ;
-    static const char KEY_QC_SUPPORTED_HISTOGRAM_MODES[] ;
+    static const char KEY_HISTOGRAM[] ;
+    static const char KEY_SUPPORTED_HISTOGRAM_MODES[] ;
     // Values for HISTOGRAM
     static const char HISTOGRAM_ENABLE[] ;
     static const char HISTOGRAM_DISABLE[] ;
@@ -241,7 +241,7 @@ public:
    //    static const char HDR_DISABLE[];
 
 
-   static const char KEY_QC_SINGLE_ISP_OUTPUT_ENABLED[];
+   static const char KEY_SINGLE_ISP_OUTPUT_ENABLED[];
 
     enum {
         CAMERA_ORIENTATION_UNKNOWN = 0,

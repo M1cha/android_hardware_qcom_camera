@@ -895,7 +895,7 @@ status_t QCameraStream_preview::processPreviewFrameWithDisplay(
   if(mHFRFrameSkip == 1)
   {
       const char *str = mHalCamCtrl->mParameters.get(
-                          QCameraParameters::KEY_QC_VIDEO_HIGH_FRAME_RATE);
+                          QCameraParameters::KEY_VIDEO_HIGH_FRAME_RATE);
       if(str != NULL){
       int is_hfr_off = 0;
       mHFRFrameCnt++;

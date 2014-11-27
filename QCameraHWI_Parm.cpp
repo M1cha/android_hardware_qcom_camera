@@ -33,7 +33,7 @@
 #include <linux/android_pmem.h>
 #endif
 #include <linux/ioctl.h>
-#include <camera/QCameraParameters.h>
+#include "QCameraParameters.h"
 #include <media/mediarecorder.h>
 #include <gralloc_priv.h>
 
@@ -61,9 +61,6 @@ extern "C" {
 #include <sys/time.h>
 #include <stdlib.h>
 #include <linux/ion.h>
-#include <camera.h>
-#include <cam_fifo.h>
-#include <jpege.h>
 
 } // extern "C"
 

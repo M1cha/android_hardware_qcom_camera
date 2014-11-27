@@ -448,7 +448,7 @@ void QCameraStream_preview::notifyROIEvent(fd_roi_t roi)
               roi.d.data.face.right_eye_center[0]*2000/mHalCamCtrl->mDimension.display_width - 1000;
             mHalCamCtrl->mFace[idx].right_eye[1] =
               roi.d.data.face.right_eye_center[1]*2000/mHalCamCtrl->mDimension.display_height - 1000;
-
+#ifdef QCOM_BSP
             // Center of mouth
             mHalCamCtrl->mFace[idx].mouth[0] =
               roi.d.data.face.mouth_center[0]*2000/mHalCamCtrl->mDimension.display_width - 1000;
@@ -485,7 +485,7 @@ void QCameraStream_preview::notifyROIEvent(fd_roi_t roi)
                mHalCamCtrl->mFace[idx].leftright_dir, mHalCamCtrl->mFace[idx].roll_dir,
                mHalCamCtrl->mFace[idx].blink_detected,
                mHalCamCtrl->mFace[idx].leye_blink, mHalCamCtrl->mFace[idx].reye_blink);
-
+#endif
              mNumFDRcvd++;
              mDisplayLock.unlock();
 

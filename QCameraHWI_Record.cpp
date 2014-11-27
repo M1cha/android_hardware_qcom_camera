@@ -158,7 +158,7 @@ status_t QCameraStream_record::start()
     return BAD_VALUE;
   }
 
-  setFormat(MM_CAMERA_CH_VIDEO_MASK, (cam_format_t)0);
+  setFormat(MM_CAMERA_CH_VIDEO_MASK , (cam_format_t)0);
   //mRecordFreeQueueLock.lock();
   //mRecordFreeQueue.clear();
   //mRecordFreeQueueLock.unlock();
@@ -183,7 +183,7 @@ status_t QCameraStream_record::start()
   /*
   * Start Video Streaming
   */
-  ret = cam_ops_action(mCameraId, TRUE, MM_CAMERA_OPS_VIDEO, 0);
+  ret = cam_ops_action(mCameraId, true, MM_CAMERA_OPS_VIDEO, 0);
   if (MM_CAMERA_OK != ret) {
     ALOGE ("%s ERROR: Video streaming start err=%d\n", __func__, ret);
     ret = BAD_VALUE;
@@ -270,7 +270,7 @@ void QCameraStream_record::stop()
   /* unregister the notify fn from the mmmm_camera_t object
    *  call stop() in parent class to stop the monitor thread */
 
-  ret = cam_ops_action(mCameraId, FALSE, MM_CAMERA_OPS_VIDEO, 0);
+  ret = cam_ops_action(mCameraId, false, MM_CAMERA_OPS_VIDEO, 0);
   if (MM_CAMERA_OK != ret) {
     ALOGE ("%s ERROR: Video streaming Stop err=%d\n", __func__, ret);
   }

@@ -112,7 +112,7 @@ public:
     virtual status_t takePictureLiveshot(mm_camera_ch_data_buf_t* recvd_frame,
                                  cam_ctrl_dimension_t *dim,
                                  int frame_len){return NO_ERROR;}
-    virtual void setModeLiveSnapshot(bool){;}
+	virtual void setModeLiveSnapshot(bool){;}
     virtual status_t initSnapshotBuffers(cam_ctrl_dimension_t *dim,
                                  int num_of_buf){return NO_ERROR;}
 
@@ -120,7 +120,7 @@ public:
     /* Set the ANativeWindow */
     virtual int setPreviewWindow(preview_stream_ops_t* window) {return NO_ERROR;}
     virtual void notifyROIEvent(fd_roi_t roi) {;}
-    virtual void notifyWDenoiseEvent(cam_ctrl_status_t status, void * cookie) {;}
+    virtual void notifyWDenoiseEvent(cam_ctrl_status_t status, void * cookie) {};
     virtual void resetSnapshotCounters(void ){};
 
     QCameraStream();
@@ -133,7 +133,7 @@ public:
     camera_mode_t myMode;
 
     mutable Mutex mStopCallbackLock;
-    int     mSnapshotDataCallingBack;
+	int     mSnapshotDataCallingBack;
     int     mFreeSnapshotBufAfterDataCb;
 private:
    StreamQueue mBusyQueue;
@@ -210,6 +210,7 @@ public:
     status_t initPreviewOnlyBuffers();
 
     status_t processPreviewFrame(mm_camera_ch_data_buf_t *frame);
+
     /*init preview buffers with display case*/
     status_t processPreviewFrameWithDisplay(mm_camera_ch_data_buf_t *frame);
     /*init preview buffers without display case*/

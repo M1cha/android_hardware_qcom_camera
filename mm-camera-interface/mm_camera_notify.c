@@ -373,7 +373,7 @@ end:
 send_to_hal:
     for( i=0;i < MM_CAMERA_BUF_CB_MAX;i++) {
         if (buf_cb[i].cb && my_obj->poll_threads[MM_CAMERA_CH_SNAPSHOT].data.used == 1)
-          buf_cb[i].cb(&data,buf_cb[i].user_data);
+            buf_cb[i].cb(&data,buf_cb[i].user_data);
     }
     if(deliver_done > 0) {
         mm_camera_event_t data_evt;
@@ -700,6 +700,7 @@ static void mm_camera_read_video_frame(mm_camera_obj_t * my_obj)
     idx =  mm_camera_read_msm_frame(my_obj,stream);
     if (idx < 0)
         return;
+
     ALOGV("Video thread locked");
     memset(buf_cb,0,sizeof(mm_camera_buf_cb_t) * MM_CAMERA_BUF_CB_MAX);
     pthread_mutex_lock(&my_obj->ch[MM_CAMERA_CH_VIDEO].mutex);

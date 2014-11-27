@@ -485,7 +485,7 @@ status_t QCameraStream_Rdi::start()
     /* call mm_camera action start(...)  */
 
      ALOGE("Starting RDI Stream. ");
-     ret = cam_ops_action(mCameraId, TRUE, MM_CAMERA_OPS_RDI, 0);
+     ret = cam_ops_action(mCameraId, true, MM_CAMERA_OPS_RDI, 0);
      if (MM_CAMERA_OK != ret) {
        ALOGE ("%s: rdi streaming start err=%d\n", __func__, ret);
         ret = BAD_VALUE;
@@ -525,7 +525,7 @@ end:
     /* call stop() in parent class to stop the monitor thread*/
     stream_info = mHalCamCtrl->getChannelInterface();
 
-    ret = cam_ops_action(mCameraId, FALSE, MM_CAMERA_OPS_RDI, 0);
+    ret = cam_ops_action(mCameraId, false, MM_CAMERA_OPS_RDI, 0);
     if(MM_CAMERA_OK != ret) {
       ALOGE ("%s: camera rdi stop err=%d\n", __func__, ret);
     }

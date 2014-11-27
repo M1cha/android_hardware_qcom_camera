@@ -56,56 +56,56 @@ extern "C" {
  */
 
 static hw_module_methods_t camera_module_methods = {
-    open: camera_device_open,
+    .open = camera_device_open,
 };
 
 static hw_module_t camera_common  = {
-  tag: HARDWARE_MODULE_TAG,
-  version_major: 0,
-  version_minor: 01,
-  id: CAMERA_HARDWARE_MODULE_ID,
-  name: "Qcamera",
-  author:"Qcom",
-  methods: &camera_module_methods,
-  dso: NULL,
+  .tag = HARDWARE_MODULE_TAG,
+  .version_major = 0,
+  .version_minor = 01,
+  .id = CAMERA_HARDWARE_MODULE_ID,
+  .name = "Qcamera",
+  .author ="Qcom",
+  .methods = &camera_module_methods,
+  .dso = NULL,
   //reserved[0]:  0,
 };
 camera_module_t HAL_MODULE_INFO_SYM = {
-  common: camera_common,
-  get_number_of_cameras: get_number_of_cameras,
-  get_camera_info: get_camera_info,
+  .common = camera_common,
+  .get_number_of_cameras = get_number_of_cameras,
+  .get_camera_info = get_camera_info,
 };
 
 camera_device_ops_t camera_ops = {
-  set_preview_window:         android::set_preview_window,
-  set_callbacks:              android::set_CallBacks,
-  enable_msg_type:            android::enable_msg_type,
-  disable_msg_type:           android::disable_msg_type,
-  msg_type_enabled:           android::msg_type_enabled,
+  .set_preview_window =         android::set_preview_window,
+  .set_callbacks =              android::set_CallBacks,
+  .enable_msg_type =            android::enable_msg_type,
+  .disable_msg_type =           android::disable_msg_type,
+  .msg_type_enabled =           android::msg_type_enabled,
 
-  start_preview:              android::start_preview,
-  stop_preview:               android::stop_preview,
-  preview_enabled:            android::preview_enabled,
-  store_meta_data_in_buffers: android::store_meta_data_in_buffers,
+  .start_preview =              android::start_preview,
+  .stop_preview =               android::stop_preview,
+  .preview_enabled =            android::preview_enabled,
+  .store_meta_data_in_buffers = android::store_meta_data_in_buffers,
 
-  start_recording:            android::start_recording,
-  stop_recording:             android::stop_recording,
-  recording_enabled:          android::recording_enabled,
-  release_recording_frame:    android::release_recording_frame,
+  .start_recording =           android::start_recording,
+  .stop_recording =            android::stop_recording,
+  .recording_enabled =         android::recording_enabled,
+  .release_recording_frame =   android::release_recording_frame,
 
-  auto_focus:                 android::auto_focus,
-  cancel_auto_focus:          android::cancel_auto_focus,
+  .auto_focus =                android::auto_focus,
+  .cancel_auto_focus =         android::cancel_auto_focus,
 
-  take_picture:               android::take_picture,
-  cancel_picture:             android::cancel_picture,
+  .take_picture =              android::take_picture,
+  .cancel_picture =            android::cancel_picture,
 
-  set_parameters:             android::set_parameters,
-  get_parameters:             android::get_parameters,
-  put_parameters:             android::put_parameters,
-  send_command:               android::send_command,
+  .set_parameters =            android::set_parameters,
+  .get_parameters =            android::get_parameters,
+  .put_parameters =            android::put_parameters,
+  .send_command =              android::send_command,
 
-  release:                    android::release,
-  dump:                       android::dump,
+  .release =                   android::release,
+  .dump =                      android::dump,
 };
 
 namespace android {
@@ -137,7 +137,7 @@ QCameraHardwareInterface *util_get_Hal_obj( struct camera_device * device)
     return hardware;
 }
 
-#if 0 //mzhu
+#if 0
 QCameraParameters* util_get_HAL_parameter( struct camera_device * device)
 {
     QCameraParameters *param = NULL;
@@ -147,8 +147,7 @@ QCameraParameters* util_get_HAL_parameter( struct camera_device * device)
     }
     return param;
 }
-#endif //mzhu
-
+#endif
 extern "C" int get_number_of_cameras()
 {
     /* try to query every time we get the call!*/
@@ -175,6 +174,8 @@ extern "C" int get_camera_info(int camera_id, struct camera_info *info)
     return rc;
 }
 
+static pthread_mutex_t camera_session_lock = PTHREAD_MUTEX_INITIALIZER;
+static unsigned int QCameraSession = 0;
 
 /* HAL should return NULL if it fails to open camera hardware. */
 extern "C" int  camera_device_open(
@@ -182,8 +183,17 @@ extern "C" int  camera_device_open(
           struct hw_device_t** hw_device)
 {
     int rc = -1;
-	int mode = 0; // TODO: need to add 3d/2d mode, etc
+    int mode = 0; // TODO: need to add 3d/2d mode, etc
     camera_device *device = NULL;
+
+    pthread_mutex_lock(&camera_session_lock);
+
+    //Return -EUSERS to framework if multiple camera instances detected.
+    if(QCameraSession) {
+       ALOGE("%s Multiple camera open instances are not supported",__func__);
+       pthread_mutex_unlock(&camera_session_lock);
+       return -EUSERS;
+    }
     if(module && id && hw_device) {
         int cameraId = atoi(id);
 
@@ -192,18 +202,20 @@ extern "C" int  camera_device_open(
                 (camera_hardware_t *) malloc(sizeof (camera_hardware_t));
             if(!camHal) {
                 *hw_device = NULL;
-				    ALOGE("%s:  end in no mem", __func__);
-				    return rc;
-		    }
+                ALOGE("%s:  end in no mem", __func__);
+                pthread_mutex_unlock(&camera_session_lock);
+                return rc;
+            }
             /* we have the camera_hardware obj malloced */
             memset(camHal, 0, sizeof (camera_hardware_t));
             camHal->hardware = new QCameraHardwareInterface(cameraId, mode); //HAL_openCameraHardware(cameraId);
             if (camHal->hardware && camHal->hardware->isCameraReady()) {
-				camHal->cameraId = cameraId;
-		        device = &camHal->hw_dev;
+                camHal->cameraId = cameraId;
+                device = &camHal->hw_dev;
                 device->common.close = close_camera_device;
                 device->ops = &camera_ops;
                 device->priv = (void *)camHal;
+                QCameraSession++;
                 rc =  0;
             } else {
                 if (camHal->hardware) {
@@ -215,9 +227,10 @@ extern "C" int  camera_device_open(
             }
         }
     }
-	/* pass actual hw_device ptr to framework. This amkes that we actally be use memberof() macro */
+    /* pass actual hw_device ptr to framework. This amkes that we actally be use memberof() macro */
     *hw_device = (hw_device_t*)&device->common;
     ALOGV("%s:  end rc %d", __func__, rc);
+    pthread_mutex_unlock(&camera_session_lock);
     return rc;
 }
 
@@ -226,6 +239,8 @@ extern "C"  int close_camera_device( hw_device_t *hw_dev)
     ALOGV("Q%s: device =%p E", __func__, hw_dev);
     int rc =  -1;
     camera_device_t *device = (camera_device_t *)hw_dev;
+
+    pthread_mutex_lock(&camera_session_lock);
 
     if(device) {
         camera_hardware_t *camHal = (camera_hardware_t *)device->priv;
@@ -236,12 +251,16 @@ extern "C"  int close_camera_device( hw_device_t *hw_dev)
                     hardware->release( );
                 }
             }
+            if (QCameraSession)
+                QCameraSession--;
             if(hardware != NULL)
                 delete hardware;
             free(camHal);
         }
         rc = 0;
     }
+
+    pthread_mutex_unlock(&camera_session_lock);
     return rc;
 }
 

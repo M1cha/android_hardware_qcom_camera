@@ -190,7 +190,6 @@ uint32_t mm_camera_get_msm_frame_len(cam_format_t fmt_type,
     *num_planes = 0;
     int local_height;
 
-
     switch (fmt_type) {
     case CAMERA_YUV_420_NV12:
     case CAMERA_YUV_420_NV21:
@@ -212,22 +211,19 @@ uint32_t mm_camera_get_msm_frame_len(cam_format_t fmt_type,
             size = plane[0] + plane[1];
         }
         break;
-
     case CAMERA_YUV_420_YV12:
-
-      if(CAMERA_MODE_3D == mode) {
-
-        *num_planes = 1;
+        if (CAMERA_MODE_3D == mode) {
+          *num_planes = 1;
           size = (uint32_t)(PAD_TO_2K(width*height)*3/2);
           plane[0] = PAD_TO_WORD(width*height);
-      } else {
+        } else {
           *num_planes = 3;
           plane[0] = PAD_TO_2K(CEILING16(width) * height);
           plane[1] = PAD_TO_2K(CEILING16(width/2) * height/2);
           plane[2] = PAD_TO_2K(CEILING16(width/2) * height/2);
           size = plane[0] + plane[1] + plane[2];
-      }
-      break;
+       }
+       break;
     case CAMERA_BAYER_SBGGR10:
     case CAMERA_RDI:
         *num_planes = 1;

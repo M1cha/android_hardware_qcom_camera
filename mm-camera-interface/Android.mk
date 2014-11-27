@@ -1,6 +1,3 @@
-
-#ifeq ($(call is-board-platform,msm8960),true)
-
 LOCAL_PATH:= $(call my-dir)
 LOCAL_DIR_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
@@ -21,8 +18,6 @@ LOCAL_COPY_HEADERS_TO := mm-camera-interface
 LOCAL_COPY_HEADERS += mm_camera_interface2.h
 LOCAL_COPY_HEADERS += mm_omx_jpeg_encoder.h
 
-LOCAL_C_INCLUDES+= $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
-LOCAL_ADDITIONAL_DEPENDENCIES := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 LOCAL_C_INCLUDES+= $(LOCAL_PATH)/..
 LOCAL_C_INCLUDES+= $(LOCAL_PATH)/../inc
 
@@ -38,5 +33,3 @@ LOCAL_SHARED_LIBRARIES := libdl libcutils liblog
 LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
-
-#endif

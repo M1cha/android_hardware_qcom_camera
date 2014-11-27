@@ -75,6 +75,7 @@ static int32_t mm_camera_poll_sig(mm_camera_poll_thread_t *poll_cb,
     cmd_evt.cmd = cmd;
     int len;
     CDBG("%s: begin", __func__);
+
     pthread_mutex_lock(&poll_cb->mutex);
     /* reset the statue to false */
     poll_cb->status = FALSE;

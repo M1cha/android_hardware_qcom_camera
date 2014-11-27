@@ -35,9 +35,6 @@
 #include <inttypes.h>
 #include <media/msm_camera.h>
 
-#define TRUE 1
-#define FALSE 0
-
 #define PAD_TO_WORD(a)               (((a)+3)&~3)
 #define PAD_TO_2K(a)                 (((a)+2047)&~2047)
 #define PAD_TO_4K(a)                 (((a)+4095)&~4095)

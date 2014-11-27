@@ -39,7 +39,6 @@
 #include "mm_omx_jpeg_encoder.h"
 
 static uint8_t hw_encode = true;
-
 static int jpegRotation = 0;
 static int isZSLMode = 0;
 static int jpegThumbnailQuality = 75;
@@ -239,7 +238,7 @@ int8_t mm_jpeg_encoder_get_buffer_offset(uint32_t width, uint32_t height,
 {
     ALOGV("%s:", __func__);
     if ((NULL == p_y_offset) || (NULL == p_cbcr_offset)) {
-        return FALSE;
+        return false;
     }
     *num_planes = 2;
     if (hw_encode ) {
@@ -264,7 +263,7 @@ int8_t mm_jpeg_encoder_get_buffer_offset(uint32_t width, uint32_t height,
         planes[0] = PAD_TO_WORD(width*CEILING16(height));
         planes[1] = PAD_TO_WORD(width*CEILING16(height)/2);
     }
-    return TRUE;
+    return true;
 }
 
 int8_t omxJpegOpen()
@@ -289,11 +288,12 @@ int8_t omxJpegOpen()
     OMX_ERRORTYPE ret = (*pOMX_GetHandle)(&pHandle, "OMX.qcom.image.jpeg.encoder",
       NULL, &callbacks);
     pthread_mutex_unlock(&jpege_mutex);
-    return TRUE;
+    return true;
 }
 
 int8_t omxJpegStart(uint8_t hw_encode_enable)
 {
+    int rc = 0;
     ALOGV("%s", __func__);
     pthread_mutex_lock(&jpege_mutex);
     hw_encode = hw_encode_enable;
@@ -302,9 +302,9 @@ int8_t omxJpegStart(uint8_t hw_encode_enable)
     callbacks.EventHandler = eventHandler;
     pthread_mutex_init(&lock, NULL);
     pthread_cond_init(&cond, NULL);
-    (*pOMX_Init)();
+    rc = (*pOMX_Init)();
     pthread_mutex_unlock(&jpege_mutex);
-    return TRUE;
+    return rc;
 }
 
 static omx_jpeg_color_format format_cam2jpeg(cam_format_t fmt)
@@ -432,7 +432,7 @@ int8_t omxJpegEncodeNext(omx_jpeg_encode_params *encode_params)
     OMX_FillThisBuffer(pHandle, pOutBuffers);
     pthread_mutex_unlock(&jpege_mutex);
     ALOGV("%s:X", __func__);
-    return TRUE;
+    return true;
 }
 
 int8_t omxJpegEncode(omx_jpeg_encode_params *encode_params)
@@ -723,7 +723,7 @@ int8_t omxJpegEncode(omx_jpeg_encode_params *encode_params)
     OMX_FillThisBuffer(pHandle, pOutBuffers);
     pthread_mutex_unlock(&jpege_mutex);
     ALOGV("%s:X", __func__);
-    return TRUE;
+    return true;
 }
 
 void omxJpegFinish()
@@ -782,7 +782,7 @@ int8_t mm_jpeg_encoder_setMainImageQuality(uint32_t quality)
     if (quality <= 100)
         jpegMainimageQuality = quality;
     pthread_mutex_unlock(&jpege_mutex);
-    return TRUE;
+    return true;
 }
 
 int8_t mm_jpeg_encoder_setThumbnailQuality(uint32_t quality)
@@ -793,7 +793,7 @@ int8_t mm_jpeg_encoder_setThumbnailQuality(uint32_t quality)
     if (quality <= 100)
         jpegThumbnailQuality = quality;
     pthread_mutex_unlock(&jpege_mutex);
-    return TRUE;
+    return true;
 }
 
 int8_t mm_jpeg_encoder_setRotation(int rotation, int isZSL)
@@ -818,7 +818,7 @@ int8_t mm_jpeg_encoder_setRotation(int rotation, int isZSL)
         break;
     }
     pthread_mutex_unlock(&jpege_mutex);
-    return TRUE;
+    return true;
 }
 
 /*===========================================================================

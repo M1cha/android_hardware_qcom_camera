@@ -339,7 +339,7 @@ PmemPool::PmemPool(const char *pmem_pool,
 
 PmemPool::~PmemPool()
 {
-    ALOGI("%s: %s E", __FUNCTION__, mName);
+    ALOGV("%s: %s E", __FUNCTION__, mName);
 #if 0
     if (mHeap != NULL) {
         // Unregister preview buffers with the camera drivers.
@@ -364,7 +364,7 @@ PmemPool::~PmemPool()
     }
     mMMCameraDLRef.clear();
 #endif
-    ALOGI("%s: %s X", __FUNCTION__, mName);
+    ALOGV("%s: %s X", __FUNCTION__, mName);
 }
 MemPool::~MemPool()
 {

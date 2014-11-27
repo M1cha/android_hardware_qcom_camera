@@ -247,7 +247,7 @@ uint32_t mm_camera_get_msm_frame_len(cam_format_t fmt_type,
         size = plane[0] + plane[1];
         break;
     default:
-        CDBG_ERROR("%s: format %d not supported.\n",
+        CDBG("%s: format %d not supported.\n",
             __func__, fmt_type);
         size = 0;
     }

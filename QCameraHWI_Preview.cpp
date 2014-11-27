@@ -56,7 +56,7 @@ static void preview_notify_cb(mm_camera_ch_data_buf_t *frame,
 status_t QCameraStream_preview::setPreviewWindow(preview_stream_ops_t* window)
 {
     status_t retVal = NO_ERROR;
-    ALOGE(" %s: E ", __FUNCTION__);
+    ALOGV(" %s: E ", __FUNCTION__);
     if( window == NULL) {
         ALOGW(" Setting NULL preview window ");
         /* TODO: Current preview window will be invalidated.
@@ -77,10 +77,10 @@ status_t QCameraStream_preview::getBufferFromSurface()
     status_t ret = NO_ERROR;
     int gralloc_usage;
 
-    ALOGI(" %s : E ", __FUNCTION__);
+    ALOGV(" %s : E ", __FUNCTION__);
 
     if( mPreviewWindow == NULL) {
-    ALOGE("%s: mPreviewWindow = NULL", __func__);
+        ALOGE("%s: mPreviewWindow = NULL", __func__);
         return INVALID_OPERATION;
     }
     cam_ctrl_dimension_t dim;
@@ -159,39 +159,38 @@ status_t QCameraStream_preview::getBufferFromSurface()
 										&mHalCamCtrl->mPreviewMemory.buffer_handle[cnt],
 										&mHalCamCtrl->mPreviewMemory.stride[cnt]);
 		if(!err) {
-          ALOGV("%s: dequeue buf hdl =%p, size =%d, stride=%d", __func__, *mHalCamCtrl->mPreviewMemory.buffer_handle[cnt],
-                ((struct private_handle_t *)(*mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]))->size,  mHalCamCtrl->mPreviewMemory.stride[cnt]);
+            ALOGV("%s: dequeue buf hdl =%p", __func__, *mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]);
             err = mPreviewWindow->lock_buffer(this->mPreviewWindow,
                         mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]);
             // lock the buffer using genlock
-                    ALOGV("%s: camera call genlock_lock, hdl=%p", __FUNCTION__, (*mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]));
+            ALOGV("%s: camera call genlock_lock, hdl=%p", __FUNCTION__, (*mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]));
             if (GENLOCK_NO_ERROR != genlock_lock_buffer((native_handle_t *)(*mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]),
                     GENLOCK_WRITE_LOCK, GENLOCK_MAX_TIMEOUT)) {
-                       ALOGV("%s: genlock_lock_buffer(WRITE) failed", __FUNCTION__);
+                ALOGV("%s: genlock_lock_buffer(WRITE) failed", __FUNCTION__);
                 mHalCamCtrl->mPreviewMemory.local_flag[cnt] = BUFFER_UNLOCKED;
                 //mHalCamCtrl->mPreviewMemoryLock.unlock();
                 //return -EINVAL;
             } else {
-                     ALOGV("%s: genlock_lock_buffer hdl =%p", __FUNCTION__, *mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]);
+                ALOGV("%s: genlock_lock_buffer hdl =%p", __FUNCTION__, *mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]);
                 mHalCamCtrl->mPreviewMemory.local_flag[cnt] = BUFFER_LOCKED;
             }
 		} else {
             mHalCamCtrl->mPreviewMemory.local_flag[cnt] = BUFFER_NOT_OWNED;
-          ALOGV("%s: dequeue_buffer idx = %d err = %d", __func__, cnt, err);
+            ALOGV("%s: dequeue_buffer idx = %d err = %d", __func__, cnt, err);
         }
 
 		ALOGV("%s: dequeue buf: %p\n", __func__, mHalCamCtrl->mPreviewMemory.buffer_handle[cnt]);
 
 		if(err != 0) {
-            ALOGV("%s: dequeue_buffer failed: %s (%d)", __func__,
+            ALOGE("%s: dequeue_buffer failed: %s (%d)", __func__,
                     strerror(-err), -err);
             ret = UNKNOWN_ERROR;
 			for(int i = 0; i < cnt; i++) {
                 if (BUFFER_LOCKED == mHalCamCtrl->mPreviewMemory.local_flag[i]) {
-                      ALOGV("%s: camera call genlock_unlock", __FUNCTION__);
+                    ALOGV("%s: camera call genlock_unlock", __FUNCTION__);
                     if (GENLOCK_FAILURE == genlock_unlock_buffer((native_handle_t *)
                                                   (*(mHalCamCtrl->mPreviewMemory.buffer_handle[i])))) {
-                        ALOGV("%s: genlock_unlock_buffer failed: hdl =%p", __FUNCTION__, (*(mHalCamCtrl->mPreviewMemory.buffer_handle[i])) );
+                        ALOGE("%s: genlock_unlock_buffer failed: hdl =%p", __FUNCTION__, (*(mHalCamCtrl->mPreviewMemory.buffer_handle[i])) );
                          //mHalCamCtrl->mPreviewMemoryLock.unlock();
                         //return -EINVAL;
                     } else {
@@ -237,7 +236,7 @@ status_t QCameraStream_preview::getBufferFromSurface()
     memset(&mHalCamCtrl->mMetadata, 0, sizeof(mHalCamCtrl->mMetadata));
     memset(mHalCamCtrl->mFace, 0, sizeof(mHalCamCtrl->mFace));
 
-    ALOGI(" %s : X ",__FUNCTION__);
+    ALOGV(" %s : X ",__FUNCTION__);
 end:
     //mDisplayLock.unlock();
     mHalCamCtrl->mPreviewMemoryLock.unlock();
@@ -249,7 +248,7 @@ status_t QCameraStream_preview::putBufferToSurface() {
     int err = 0;
     status_t ret = NO_ERROR;
 
-    ALOGI(" %s : E ", __FUNCTION__);
+    ALOGV(" %s : E ", __FUNCTION__);
 
     mHalCamCtrl->mPreviewMemoryLock.lock();
 	for (int cnt = 0; cnt < mHalCamCtrl->mPreviewMemory.buffer_count; cnt++) {
@@ -273,7 +272,7 @@ status_t QCameraStream_preview::putBufferToSurface() {
                 ALOGV("%s: camera call genlock_unlock", __FUNCTION__);
 	        if (GENLOCK_FAILURE == genlock_unlock_buffer((native_handle_t *)
                                                     (*(mHalCamCtrl->mPreviewMemory.buffer_handle[cnt])))) {
-                    ALOGV("%s: genlock_unlock_buffer failed, handle =%p", __FUNCTION__, (*(mHalCamCtrl->mPreviewMemory.buffer_handle[cnt])));
+                    ALOGE("%s: genlock_unlock_buffer failed, handle =%p", __FUNCTION__, (*(mHalCamCtrl->mPreviewMemory.buffer_handle[cnt])));
                     continue;
 	                //mHalCamCtrl->mPreviewMemoryLock.unlock();
                     //return -EINVAL;
@@ -299,7 +298,7 @@ status_t QCameraStream_preview::putBufferToSurface() {
 
     mHalCamCtrl->mPreviewMemoryLock.unlock();
 	memset(&mHalCamCtrl->mPreviewMemory, 0, sizeof(mHalCamCtrl->mPreviewMemory));
-    ALOGI(" %s : X ",__FUNCTION__);
+    ALOGV(" %s : X ",__FUNCTION__);
     return NO_ERROR;
 }
 
@@ -312,7 +311,7 @@ status_t  QCameraStream_preview::getBufferNoDisplay( )
   cam_ctrl_dimension_t dim;
   uint32_t planes[VIDEO_MAX_PLANES];
 
-  ALOGI("%s : E ", __FUNCTION__);
+  ALOGV("%s : E ", __FUNCTION__);
 
 
   ret = cam_config_get_parm(mCameraId, MM_CAMERA_PARM_DIMENSION, &dim);
@@ -336,7 +335,7 @@ status_t  QCameraStream_preview::getBufferNoDisplay( )
   y_off = dim.display_frame_offset.mp[0].offset;
   cbcr_off = dim.display_frame_offset.mp[1].offset;
 
-  ALOGE("%s: preview: rotation = %d, yoff = %d, cbcroff = %d, size = %d, width = %d, height = %d",
+  ALOGV("%s: main image: rotation = %d, yoff = %d, cbcroff = %d, size = %d, width = %d, height = %d",
        __func__, dim.rotation, y_off, cbcr_off, frame_len,
        dim.display_width, dim.display_height);
   if (mHalCamCtrl->initHeapMem(&mHalCamCtrl->mNoDispPreviewMemory,
@@ -362,7 +361,7 @@ status_t   QCameraStream_preview::freeBufferNoDisplay()
   int err = 0;
   status_t ret = NO_ERROR;
 
-  ALOGI(" %s : E ", __FUNCTION__);
+  ALOGV(" %s : E ", __FUNCTION__);
 
   mHalCamCtrl->mPreviewMemoryLock.lock();
   for (int cnt = 0; cnt < mHalCamCtrl->mNoDispPreviewMemory.buffer_count; cnt++) {
@@ -381,7 +380,7 @@ status_t   QCameraStream_preview::freeBufferNoDisplay()
   }
 
   mHalCamCtrl->mPreviewMemoryLock.unlock();
-  ALOGI(" %s : X ",__FUNCTION__);
+  ALOGV(" %s : X ",__FUNCTION__);
   return NO_ERROR;
 }
 
@@ -519,7 +518,7 @@ status_t QCameraStream_preview::initDisplayBuffers()
   cam_ctrl_dimension_t dim;
   int i;
 
-  ALOGE("%s:BEGIN",__func__);
+  ALOGV("%s:BEGIN",__func__);
   memset(&mHalCamCtrl->mMetadata, 0, sizeof(camera_frame_metadata_t));
   mHalCamCtrl->mPreviewMemoryLock.lock();
   memset(&mHalCamCtrl->mPreviewMemory, 0, sizeof(mHalCamCtrl->mPreviewMemory));
@@ -534,7 +533,7 @@ status_t QCameraStream_preview::initDisplayBuffers()
   ret = cam_config_get_parm(mCameraId, MM_CAMERA_PARM_DIMENSION, &dim);
   if (MM_CAMERA_OK != ret) {
     ALOGE("%s: error - can't get camera dimension!", __func__);
-    ALOGE("%s: X", __func__);
+    ALOGV("%s: X", __func__);
     return BAD_VALUE;
   }else {
     width =  dim.display_width,
@@ -634,7 +633,7 @@ status_t QCameraStream_preview::initDisplayBuffers()
   mDisplayBuf.ch_type = MM_CAMERA_CH_PREVIEW;
   mDisplayBuf.preview.num = mDisplayStreamBuf.num;
   mHalCamCtrl->mPreviewMemoryLock.unlock();
-  ALOGE("%s:END",__func__);
+  ALOGV("%s:END",__func__);
   return NO_ERROR;
 
 error:
@@ -658,7 +657,7 @@ status_t QCameraStream_preview::initPreviewOnlyBuffers()
 
   cam_ctrl_dimension_t dim;
 
-  ALOGE("%s:BEGIN",__func__);
+  ALOGV("%s:BEGIN",__func__);
   memset(&mHalCamCtrl->mMetadata, 0, sizeof(camera_frame_metadata_t));
   mHalCamCtrl->mPreviewMemoryLock.lock();
   memset(&mHalCamCtrl->mNoDispPreviewMemory, 0, sizeof(mHalCamCtrl->mNoDispPreviewMemory));
@@ -670,7 +669,7 @@ status_t QCameraStream_preview::initPreviewOnlyBuffers()
   ret = cam_config_get_parm(mCameraId, MM_CAMERA_PARM_DIMENSION, &dim);
   if (MM_CAMERA_OK != ret) {
     ALOGE("%s: error - can't get camera dimension!", __func__);
-    ALOGE("%s: X", __func__);
+    ALOGV("%s: X", __func__);
     return BAD_VALUE;
   }else {
     width =  dim.display_width;
@@ -764,7 +763,7 @@ status_t QCameraStream_preview::initPreviewOnlyBuffers()
   mDisplayBuf.ch_type = MM_CAMERA_CH_PREVIEW;
   mDisplayBuf.preview.num = mDisplayStreamBuf.num;
   mHalCamCtrl->mPreviewMemoryLock.unlock();
-  ALOGE("%s:END",__func__);
+  ALOGV("%s:END",__func__);
   return NO_ERROR;
 
 end:
@@ -1155,7 +1154,7 @@ status_t QCameraStream_preview::processPreviewFrameWithOutDisplay(
           ALOGE("BUF DONE FAILED");
       }
 
-      ALOGD("end of cb");
+      ALOGV("end of cb");
   }
 
   return NO_ERROR;
@@ -1182,8 +1181,8 @@ QCameraStream_preview(int cameraId, camera_mode_t mode)
     mNumFDRcvd(0)
   {
     mHalCamCtrl = NULL;
-    ALOGE("%s: E", __func__);
-    ALOGE("%s: X", __func__);
+    ALOGV("%s: E", __func__);
+    ALOGV("%s: X", __func__);
   }
 // ---------------------------------------------------------------------------
 // QCameraStream_preview
@@ -1319,7 +1318,7 @@ error:
       freeBufferNoDisplay();
 
 end:
-    ALOGE("%s: X", __func__);
+    ALOGV("%s: X", __func__);
     return ret;
   }
 
@@ -1328,7 +1327,7 @@ end:
 // QCameraStream_preview
 // ---------------------------------------------------------------------------
   void QCameraStream_preview::stop() {
-    ALOGE("%s: E", __func__);
+    ALOGV("%s: E", __func__);
     int ret=MM_CAMERA_OK;
 
     if(!mActive) {
@@ -1360,7 +1359,7 @@ end:
       freeBufferNoDisplay( );
     }
 
-    ALOGE("%s: X", __func__);
+    ALOGV("%s: X", __func__);
 
   }
 // ---------------------------------------------------------------------------
@@ -1368,7 +1367,7 @@ end:
 // ---------------------------------------------------------------------------
   void QCameraStream_preview::release() {
 
-    ALOGE("%s : BEGIN",__func__);
+    ALOGV("%s : BEGIN",__func__);
     int ret=MM_CAMERA_OK,i;
 
     if(!mInit)
@@ -1395,7 +1394,7 @@ end:
                                       NULL);
 
     mInit = false;
-    ALOGE("%s: END", __func__);
+    ALOGV("%s: END", __func__);
 
   }
 

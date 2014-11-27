@@ -640,7 +640,7 @@ void mm_camera_dispatch_buffered_frames(mm_camera_obj_t *my_obj,
     mm_camera_frame_queue_t *sq = NULL;
     mm_camera_stream_t *stream1 = NULL;
     mm_camera_stream_t *stream2 = NULL;
-    ALOGE("%s: E", __func__);
+    ALOGV("%s: E", __func__);
     mm_camera_ch_util_get_stream_objs(my_obj, ch_type, &stream1, &stream2);
     stream2 = &my_obj->ch[MM_CAMERA_CH_PREVIEW].preview.stream;
     if(stream1) {

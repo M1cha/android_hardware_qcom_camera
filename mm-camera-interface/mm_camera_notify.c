@@ -464,7 +464,7 @@ static void mm_camera_read_preview_frame(mm_camera_obj_t * my_obj)
     if (idx < 0) {
         return;
     }
-    ALOGE("%s Read Preview frame %d ", __func__, idx);
+    CDBG("%s Read Preview frame %d ", __func__, idx);
     pthread_mutex_lock(&my_obj->ch[MM_CAMERA_CH_PREVIEW].mutex);
     memset(&buf_cb[0],0,sizeof(mm_camera_buf_cb_t)* MM_CAMERA_BUF_CB_MAX);
     for( i=0;i<MM_CAMERA_BUF_CB_MAX;i++) {

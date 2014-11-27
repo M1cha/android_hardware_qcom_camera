@@ -173,7 +173,7 @@ status_t QCameraStream_record::start()
 
   ret = cam_config_prepare_buf(mCameraId, &mRecordBuf);
   if(ret != MM_CAMERA_OK) {
-    ALOGV("%s ERROR: Reg Record buf err=%d\n", __func__, ret);
+    ALOGE("%s ERROR: Reg Record buf err=%d\n", __func__, ret);
     ret = BAD_VALUE;
     goto error;
   }else{
@@ -379,7 +379,7 @@ status_t QCameraStream_record::processRecordFrame(void *data)
 //Record Related Functions
 status_t QCameraStream_record::initEncodeBuffers()
 {
-  ALOGE("%s : BEGIN",__func__);
+  ALOGV("%s : BEGIN",__func__);
   status_t ret = NO_ERROR;
   const char *pmem_region;
   uint32_t frame_len;
@@ -517,7 +517,7 @@ status_t QCameraStream_record::initEncodeBuffers()
     mRecordBuf.video.video.num = mHalCamCtrl->mRecordingMemory.buffer_count;//kRecordBufferCount;
     //mRecordBuf.video.video.frame_offset = &record_offset[0];
     //mRecordBuf.video.video.frame = &recordframes[0];
-    ALOGE("%s : END",__func__);
+    ALOGV("%s : END",__func__);
     return NO_ERROR;
 }
 

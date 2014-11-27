@@ -414,7 +414,7 @@ static int mm_camera_stream_util_request_buf(mm_camera_obj_t * my_obj,
     bufreq.memory = V4L2_MEMORY_USERPTR;
     rc = ioctl(stream->fd, VIDIOC_REQBUFS, &bufreq);
     if (rc < 0) {
-      CDBG_ERROR("%s: fd=%d, ioctl VIDIOC_REQBUFS failed: rc=%d\n",
+      CDBG("%s: fd=%d, ioctl VIDIOC_REQBUFS failed: rc=%d\n",
         __func__, stream->fd, rc);
       goto end;
     }
@@ -505,8 +505,6 @@ static int mm_camera_stream_util_reg_buf(mm_camera_obj_t * my_obj,
         rc = -1;
         goto end;
     }
-    CDBG("%s frame_len =%d, mum_planes=%d", __func__, stream->frame.frame_len, num_planes);
-
     stream->frame.num_frame = vbuf->num;
     bufreq.count = stream->frame.num_frame;
     bufreq.type  = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
@@ -538,8 +536,6 @@ static int mm_camera_stream_util_reg_buf(mm_camera_obj_t * my_obj,
         } else {
             stream->frame.frame_offset[i] = 0;
         }
-
-        CDBG("%s: vbuf_mp[%d]num_planes =%d", __func__, i, stream->frame.frame[i].num_planes);
 
         rc = mm_camera_stream_qbuf(my_obj, stream, stream->frame.frame[i].idx);
         if (rc < 0) {

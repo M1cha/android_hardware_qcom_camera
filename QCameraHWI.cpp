@@ -2200,16 +2200,13 @@ void QCameraHardwareInterface::zoomEvent(cam_ctrl_status_t *status, app_notify_c
 void QCameraHardwareInterface::dumpFrameToFile(const void * data, uint32_t size, char* name, char* ext, int index)
 {
 #if 0
-    char buf[32], value[PROPERTY_VALUE_MAX];
-    int file_fd, enabled = 0;
+    char buf[32];
+    int file_fd;
     static int i = 0 ;
-    property_get("persist.camera.dumpimage", value, "0");
-    enabled = atoi(value);
-
-    if ( data != NULL && enabled) {
+    if ( data != NULL) {
         char * str;
         snprintf(buf, sizeof(buf), "/data/%s_%d.%s", name, index + i, ext);
-        ALOGE("%s size =%d", buf, size);
+        ALOGE("marvin, %s size =%d", buf, size);
         file_fd = open(buf, O_RDWR | O_CREAT, 0777);
         write(file_fd, data, size);
         close(file_fd);
@@ -2746,3 +2743,4 @@ void QCameraHardwareInterface::pausePreviewForZSL()
     }
 }
 }; // namespace android
+

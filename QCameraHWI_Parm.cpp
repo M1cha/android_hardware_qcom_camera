@@ -2655,7 +2655,7 @@ status_t QCameraHardwareInterface::setPreviewFpsRange(const QCameraParameters& p
         // if the value is in the supported list
         if(minFps==mSupportedFpsRanges[i].minFPS && maxFps == mSupportedFpsRanges[i].maxFPS) {
             found = true;
-            ALOGV("FPS: i=%d : minFps = %d, maxFps = %d ",i,FpsRangesSupported[i].minFPS,FpsRangesSupported[i].maxFPS );
+            ALOGV("FPS: i=%d : minFps = %d, maxFps = %d ", i, minFps, maxFps);
             mParameters.setPreviewFpsRange(minFps,maxFps);
             // validate the values
             bool valid = true;

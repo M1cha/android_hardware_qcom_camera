@@ -977,7 +977,7 @@ void QCameraHardwareInterface::initDefaultParameters()
     if(mFps >= MINIMUM_FPS && mFps <= MAXIMUM_FPS) {
         mParameters.setPreviewFrameRate(mFps);
     }else{
-        mParameters.setPreviewFrameRate(DEFAULT_FPS);
+        mParameters.setPreviewFrameRate(DEFAULT_FIXED_FPS);
     }
 
     //Set Picture Format
@@ -985,8 +985,8 @@ void QCameraHardwareInterface::initDefaultParameters()
     mParameters.set(QCameraParameters::KEY_SUPPORTED_PICTURE_FORMATS,
                     mPictureFormatValues);
 
-    mParameters.set(QCameraParameters::KEY_JPEG_QUALITY, "90"); // max quality
-    mJpegQuality = 90;
+    mParameters.set(QCameraParameters::KEY_JPEG_QUALITY, "85"); // max quality
+    mJpegQuality = 85;
     //Set Video Format
     mParameters.set(QCameraParameters::KEY_VIDEO_FRAME_FORMAT, "yuv420sp");
 
@@ -1046,16 +1046,15 @@ void QCameraHardwareInterface::initDefaultParameters()
 
 
     //Set default power mode
-    mParameters.set(QCameraParameters::KEY_POWER_MODE,"Low_Power");
-    //Set Wnr on
-    mParameters.set(QCameraParameters::KEY_DENOISE,true);
+    mParameters.set(QCameraParameters::KEY_POWER_MODE,"Normal_Power");
+
     //Set Camera Mode
-    mParameters.set(QCameraParameters::KEY_CAMERA_MODE,1);
+    mParameters.set(QCameraParameters::KEY_CAMERA_MODE,0);
     mParameters.set(QCameraParameters::KEY_AE_BRACKET_HDR,"Off");
 
     //Set Antibanding
     mParameters.set(QCameraParameters::KEY_ANTIBANDING,
-                    QCameraParameters::ANTIBANDING_AUTO);
+                    QCameraParameters::ANTIBANDING_OFF);
     mParameters.set(QCameraParameters::KEY_SUPPORTED_ANTIBANDING,
                     mAntibandingValues);
 
@@ -1066,7 +1065,7 @@ void QCameraHardwareInterface::initDefaultParameters()
 
     //Set Auto Exposure
     mParameters.set(QCameraParameters::KEY_AUTO_EXPOSURE,
-                    QCameraParameters::AUTO_EXPOSURE_CENTER_WEIGHTED);
+                    QCameraParameters::AUTO_EXPOSURE_FRAME_AVG);
     mParameters.set(QCameraParameters::KEY_SUPPORTED_AUTO_EXPOSURE, mAutoExposureValues);
 
     //Set WhiteBalance
@@ -1200,7 +1199,7 @@ void QCameraHardwareInterface::initDefaultParameters()
 
     //Set Denoise
     mParameters.set(QCameraParameters::KEY_DENOISE,
-                    QCameraParameters::DENOISE_ON);
+                    QCameraParameters::DENOISE_OFF);
     mParameters.set(QCameraParameters::KEY_SUPPORTED_DENOISE,
                         denoise_value);
     //Set Touch AF/AEC

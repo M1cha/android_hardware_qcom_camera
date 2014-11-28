@@ -218,7 +218,9 @@ typedef struct{
     char        gpsProcessingMethod[EXIF_ASCII_PREFIX_SIZE+GPS_PROCESSING_METHOD_SIZE];
     //Other tags
     char        dateTime[20];
+    char subsecTime[7];
     rat_t       focalLength;
+    rat_t       f_number;
     uint16_t    flashMode;
     uint16_t    isoSpeed;
 
@@ -230,6 +232,9 @@ typedef struct{
 
     int         mAltitude_ref;
     long        mGPSTimestamp;
+    int         mWbMode;
+    char        make[20];
+    char        model[20];
 
 } exif_values_t;
 

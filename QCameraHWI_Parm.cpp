@@ -674,6 +674,13 @@ void QCameraHardwareInterface::loadTables()
     }
     ALOGV("%s: X", __func__);
 }
+
+rat_t getRational(int num, int denom)
+{
+    rat_t temp = {num, denom};
+    return temp;
+}
+
 void QCameraHardwareInterface::initDefaultParameters()
 {
     bool ret;
@@ -1216,13 +1223,13 @@ void QCameraHardwareInterface::initDefaultParameters()
                     mZslValues);
 
     //Set Focal length, horizontal and vertical view angles
-    float focalLength = 0.0f;
+    focus_distances_info_t focalLength;
     float horizontalViewAngle = 0.0f;
     float verticalViewAngle = 0.0f;
     cam_config_get_parm(mCameraId, MM_CAMERA_PARM_FOCAL_LENGTH,
             (void *)&focalLength);
     mParameters.setFloat(QCameraParameters::KEY_FOCAL_LENGTH,
-                    focalLength);
+                    focalLength.focus_distance[0]);
     cam_config_get_parm(mCameraId, MM_CAMERA_PARM_HORIZONTAL_VIEW_ANGLE,
             (void *)&horizontalViewAngle);
     mParameters.setFloat(QCameraParameters::KEY_HORIZONTAL_VIEW_ANGLE,
@@ -3914,19 +3921,40 @@ void QCameraHardwareInterface::addExifTag(exif_tag_id_t tagid, exif_tag_type_t t
     mExifTableNumEntries++;
 }
 
-rat_t getRational(int num, int denom)
-{
-    rat_t temp = {num, denom};
-    return temp;
-}
-
 void QCameraHardwareInterface::initExifData(){
+    short val_short;
+    char value[PROPERTY_VALUE_MAX];
+    if (property_get("ro.product.manufacturer", value, "QCOM-AA") > 0) {
+        strncpy(mExifValues.make, value, 19);
+        mExifValues.make[19] = '\0';
+        addExifTag(EXIFTAGID_MAKE, EXIF_ASCII, strlen(value) + 1, 1, (void *)mExifValues.make);
+    } else {
+        ALOGE("%s: getExifMaker failed", __func__);
+    }
+
+    if (property_get("ro.product.model", value, "QCAM-AA") > 0) {
+        strncpy(mExifValues.model, value, 19);
+        mExifValues.model[19] = '\0';
+        addExifTag(EXIFTAGID_MODEL, EXIF_ASCII, strlen(value) + 1, 1, (void *)mExifValues.model);
+    } else {
+        ALOGE("%s: getExifModel failed", __func__);
+    }
+
     if(mExifValues.dateTime) {
         addExifTag(EXIFTAGID_EXIF_DATE_TIME_ORIGINAL, EXIF_ASCII,
+                20, 1, (void *)mExifValues.dateTime);
+        addExifTag(EXIFTAGID_EXIF_DATE_TIME_DIGITIZED, EXIF_ASCII,
                 20, 1, (void *)mExifValues.dateTime);
     }
     addExifTag(EXIFTAGID_FOCAL_LENGTH, EXIF_RATIONAL, 1, 1, (void *)&(mExifValues.focalLength));
     addExifTag(EXIFTAGID_ISO_SPEED_RATING,EXIF_SHORT,1,1,(void *)&(mExifValues.isoSpeed));
+
+    // normal f_number is from 1.2 to 22, but I'd like to put some margin.
+    if(mExifValues.f_number.num>0 && mExifValues.f_number.num<3200) {
+        addExifTag(EXIFTAGID_F_NUMBER,EXIF_RATIONAL,1,1,(void *)&(mExifValues.f_number));
+        addExifTag(EXIFTAGID_APERTURE,EXIF_RATIONAL,1,1,(void *)&(mExifValues.f_number));
+    }
+
 
     if(mExifValues.mGpsProcess) {
         addExifTag(EXIFTAGID_GPS_PROCESSINGMETHOD, EXIF_ASCII,
@@ -3978,6 +4006,18 @@ void QCameraHardwareInterface::initExifData(){
                 3, 1, (void *)mExifValues.gpsTimeStamp);
         ALOGV("EXIFTAGID_GPS_TIMESTAMP set");
     }
+
+    if (mExifValues.mWbMode == CAMERA_WB_AUTO)
+        val_short = 0;
+    else
+        val_short = 1;
+    addExifTag(EXIFTAGID_WHITE_BALANCE, EXIF_SHORT, 1, 1, &val_short);
+
+    addExifTag(EXIFTAGID_SUBSEC_TIME, EXIF_ASCII, 7, 1, (void *)mExifValues.subsecTime);
+
+    addExifTag(EXIFTAGID_SUBSEC_TIME_ORIGINAL, EXIF_ASCII, 7, 1, (void *)mExifValues.subsecTime);
+
+    addExifTag(EXIFTAGID_SUBSEC_TIME_DIGITIZED, EXIF_ASCII, 7, 1, (void *)mExifValues.subsecTime);
 }
 
 //Add all exif tags in this function
@@ -3994,7 +4034,7 @@ void QCameraHardwareInterface::setExifTags()
 
     //Set focal length
     int focalLengthValue = (int) (mParameters.getFloat(
-                QCameraParameters::KEY_FOCAL_LENGTH) * FOCAL_LENGTH_DECIMAL_PRECISION);
+            QCameraParameters::KEY_FOCAL_LENGTH) * FOCAL_LENGTH_DECIMAL_PRECISION);
 
     mExifValues.focalLength = getRational(focalLengthValue, FOCAL_LENGTH_DECIMAL_PRECISION);
 
@@ -4013,6 +4053,12 @@ void QCameraHardwareInterface::setExifTags()
             timeinfo->tm_mday, timeinfo->tm_hour,
             timeinfo->tm_min, timeinfo->tm_sec);
     //set gps tags
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    snprintf(mExifValues.subsecTime, 7, "%06ld", tv.tv_usec);
+
+    mExifValues.mWbMode = mParameters.getInt(QCameraParameters::KEY_WHITE_BALANCE);
     setExifTagsGPS();
 }
 

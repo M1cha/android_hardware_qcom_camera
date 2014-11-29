@@ -1188,6 +1188,9 @@ void QCameraHardwareInterface::initDefaultParameters()
                     NULL);
     }
 
+    //Set Skin Beautification
+    mParameters.set("skinBeautification", "0");
+
     //Set Scene Mode
     mParameters.set(QCameraParameters::KEY_SCENE_MODE,
                     QCameraParameters::SCENE_MODE_AUTO);
@@ -1378,6 +1381,8 @@ status_t QCameraHardwareInterface::setParameters(const QCameraParameters& params
     if ((rc = setGpsLocation(params)))                  final_rc = rc;
     if ((rc = setRotation(params)))                     final_rc = rc;
     if ((rc = setZoom(params)))                         final_rc = rc;
+    if ((rc = setWatermark(params)))                    final_rc = rc;
+    if ((rc = setMirror(params)))                       final_rc = rc;
     if ((rc = setOrientation(params)))                  final_rc = rc;
     if ((rc = setLensshadeValue(params)))               final_rc = rc;
     if ((rc = setMCEValue(params)))                     final_rc = rc;
@@ -1390,6 +1395,7 @@ status_t QCameraHardwareInterface::setParameters(const QCameraParameters& params
     if ((rc = setStrTextures(params)))                  final_rc = rc;
     if ((rc = setPreviewFormat(params)))                final_rc = rc;
     if ((rc = setSkinToneEnhancement(params)))          final_rc = rc;
+    if ((rc = setSkinBeautification(params)))           final_rc = rc;
     if ((rc = setWaveletDenoise(params)))               final_rc = rc;
     if ((rc = setAntibanding(params)))                  final_rc = rc;
     //    if ((rc = setOverlayFormats(params)))         final_rc = rc;
@@ -2486,6 +2492,20 @@ status_t QCameraHardwareInterface::setSkinToneEnhancement(const QCameraParameter
     return NO_ERROR;
 }
 
+status_t QCameraHardwareInterface::setSkinBeautification(const QCameraParameters& params) {
+    ALOGV("%s",__func__);
+    int skinBeautificationValue = params.getInt("skinBeautification");
+    if(mSkinBeautification != skinBeautificationValue) {
+        ALOGV(" new skin beautification correction value : %d ", skinBeautificationValue);
+        mSkinBeautification = skinBeautificationValue;
+        mParameters.set("skinBeautification", skinBeautificationValue);
+        bool ret = native_set_parms(MM_CAMERA_PARM_SKIN_BEAUTIFICATION, sizeof(mSkinBeautification),
+                      (void *)&mSkinBeautification);
+        return ret ? NO_ERROR : UNKNOWN_ERROR;
+    }
+    return NO_ERROR;
+}
+
 status_t QCameraHardwareInterface::setWaveletDenoise(const QCameraParameters& params) {
     ALOGV("%s",__func__);
     status_t rc = NO_ERROR;
@@ -3397,20 +3417,49 @@ status_t QCameraHardwareInterface::setDenoise(const QCameraParameters& params)
     return BAD_VALUE;
 }
 
+status_t QCameraHardwareInterface::setWatermark(const QCameraParameters& params)
+{
+    ALOGV("%s : E", __func__);
+    status_t rc = NO_ERROR;
+    int32_t value;
+    const char* str;
+
+    str = params.get("watermark");
+    if(str != NULL) {
+	    value = (strcmp(str, "true") == 0)? 1 : 0;
+	    rc = (native_set_parms(MM_CAMERA_PARM_WATERMARK, sizeof(int32_t), (void *)(&value))) ?
+	                            NO_ERROR : UNKNOWN_ERROR;
+    }
+
+    ALOGV("%s : X", __func__);
+    return rc;
+}
+
+status_t QCameraHardwareInterface::setMirror(const QCameraParameters& params)
+{
+    ALOGV("%s : E", __func__);
+    status_t rc = NO_ERROR;
+    int32_t value;
+    const char* str;
+
+    str = params.get("mirror");
+    if(str != NULL) {
+	    value = (strcmp(str, "true") == 0)? 1 : 0;
+	    rc = (native_set_parms(MM_CAMERA_PARM_MIRROR, sizeof(int32_t), (void *)(&value))) ?
+	                            NO_ERROR : UNKNOWN_ERROR;
+    }
+
+    ALOGV("%s : X", __func__);
+    return rc;
+}
+
 status_t QCameraHardwareInterface::setOrientation(const QCameraParameters& params)
 {
     const char *str = params.get("orientation");
+    int val = params.getInt("orientation");
+	if(val<=360)
+		native_set_parms(MM_CAMERA_PARM_ORIENTATION, sizeof(val), &val);
 
-    if (str != NULL) {
-        if (strcmp(str, "portrait") == 0 || strcmp(str, "landscape") == 0) {
-            // Camera service needs this to decide if the preview frames and raw
-            // pictures should be rotated.
-            mParameters.set("orientation", str);
-        } else {
-            ALOGE("Invalid orientation value: %s", str);
-            return BAD_VALUE;
-        }
-    }
     return NO_ERROR;
 }
 

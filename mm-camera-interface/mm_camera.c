@@ -398,6 +398,22 @@ int32_t mm_camera_set_general_parm(mm_camera_obj_t * my_obj, mm_camera_parm_t *p
       return mm_camera_send_native_ctrl_cmd(my_obj,
                         CAMERA_SET_PARM_HDR, sizeof(exp_bracketing_t), (void *)parm->p_value);
 
+    case MM_CAMERA_PARM_ORIENTATION:
+        return mm_camera_send_native_ctrl_cmd(my_obj,
+                    CAMERA_SET_ROT_INFO, sizeof(int32_t), (void *)parm->p_value);
+
+    case MM_CAMERA_PARM_SKIN_BEAUTIFICATION:
+        return mm_camera_send_native_ctrl_cmd(my_obj,
+                    CAMERA_SKIN_BEAUTIFICATION, sizeof(int32_t), (void *)parm->p_value);
+
+    case MM_CAMERA_PARM_WATERMARK:
+        return mm_camera_send_native_ctrl_cmd(my_obj,
+                    CAMERA_SET_WATERMARK, sizeof(int32_t), (void *)parm->p_value);
+
+    case MM_CAMERA_PARM_MIRROR:
+        return mm_camera_send_native_ctrl_cmd(my_obj,
+                    CAMERA_SET_MIRROR, sizeof(int32_t), (void *)parm->p_value);
+
     default:
         CDBG("%s: default: parm %d not supported\n", __func__, parm->parm_type);
         break;
@@ -650,6 +666,10 @@ int32_t mm_camera_get_parm(mm_camera_obj_t * my_obj,
                      sizeof(int), (void *)parm->p_value);
     case MM_CAMERA_PARM_FACIAL_FEATURE_INFO:
         return mm_camera_send_native_ctrl_cmd(my_obj, CAMERA_GET_FACIAL_FEATURE_INFO,
+                     sizeof(int), (void *)parm->p_value);
+
+    case MM_CAMERA_PARM_FLL_AF:
+        return mm_camera_send_native_ctrl_cmd(my_obj, CAMERA_GET_PARM_AF_SHARPNESS,
                      sizeof(int), (void *)parm->p_value);
 
     default:

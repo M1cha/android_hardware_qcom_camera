@@ -591,6 +591,9 @@ private:
     status_t setFocusMode(const QCameraParameters& params);
     status_t setBrightness(const QCameraParameters& params);
     status_t setSkinToneEnhancement(const QCameraParameters& params);
+    status_t setSkinBeautification(const QCameraParameters& params);
+    status_t setWatermark(const QCameraParameters& params);
+    status_t setMirror(const QCameraParameters& params);
     status_t setOrientation(const QCameraParameters& params);
     status_t setLensshadeValue(const QCameraParameters& params);
     status_t setMCEValue(const QCameraParameters& params);
@@ -706,6 +709,7 @@ private:
     int  mBestShotMode;
     int  mEffects;
     int  mSkinToneEnhancement;
+    int  mSkinBeautification;
     int  mDenoiseValue;
     int  mHJR;
     int  mRotation;

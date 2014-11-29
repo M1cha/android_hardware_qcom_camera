@@ -2719,6 +2719,12 @@ void QCameraHardwareInterface::takePicturePrepareHardware()
 {
     ALOGV("%s: E", __func__);
 
+    int value = 0;
+    cam_config_get_parm(mCameraId, MM_CAMERA_PARM_FLL_AF, &value);
+    ALOGV("FLL GET AF:%d ", value);
+    if (value==-1)
+        usleep(500000);
+
     /* Prepare snapshot*/
     cam_ops_action(mCameraId,
                   true,

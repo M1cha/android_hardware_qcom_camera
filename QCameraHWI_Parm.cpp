@@ -1393,6 +1393,7 @@ status_t QCameraHardwareInterface::setParameters(const QCameraParameters& params
     if ((rc = setChannelInterfaceMask(params)))         final_rc = rc;
     if ((rc = setPowerMode(params)))                    final_rc = rc;
     if ((rc = setPreviewSize(params)))                  final_rc = rc;
+    if ((rc = setMovieSolid(params)))                   final_rc = rc;
     if ((rc = setVideoSize(params)))                    final_rc = rc;
     if ((rc = setPictureSize(params)))                  final_rc = rc;
     if ((rc = setJpegThumbnailSize(params)))            final_rc = rc;
@@ -2789,6 +2790,25 @@ status_t QCameraHardwareInterface::setPreviewFpsRange(const QCameraParameters& p
 end:
     ALOGV("%s: X", __func__);
     return rc;
+}
+
+status_t QCameraHardwareInterface::setMovieSolid(const QCameraParameters& params)
+{
+	if(mVideoHDRMode) {
+		mVideoStabilization = false;
+	}
+	else {
+		const char *value = params.get(QCameraParameters::KEY_VIDEO_STABILIZATION);
+		if(!value) {
+			ALOGE("Invalid movie solid value: %s", "NULL");
+			return 0;
+		}
+
+		mParameters.set(QCameraParameters::KEY_VIDEO_STABILIZATION, value);
+		mVideoStabilization = !strcmp(value, "true");
+	}
+
+    return NO_ERROR;
 }
 
 status_t QCameraHardwareInterface::setJpegThumbnailSize(const QCameraParameters& params){

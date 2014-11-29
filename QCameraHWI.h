@@ -631,6 +631,7 @@ private:
     void takePicturePrepareHardware( );
     status_t setChannelInterfaceMask(const CameraParameters& params);
     status_t setNoDisplayMode(const QCameraParameters& params);
+    status_t setMovieSolid(const QCameraParameters& params);
 
     isp3a_af_mode_t getAutoFocusMode(const QCameraParameters& params);
     bool isValidDimension(int w, int h);
@@ -758,6 +759,7 @@ private:
     int mSnapshotFormat;
     int mZslInterval;
     bool mRestartPreview;
+    bool mVideoStabilization;
 
 /*for histogram*/
     int            mStatsOn;
@@ -859,6 +861,10 @@ private:
      uint32_t            mChannelInterfaceMask;
 
      power_module_t*   mPowerModule;
+     void *libdms;
+     int (*LINK_morpho_MovieSolid_Init)(int a, int b);
+     int (*LINK_morpho_MovieSolid_Function)(void*, void*);
+     int (*LINK_morpho_MovieSolid_Finalize)(void);
 };
 
 }; // namespace android

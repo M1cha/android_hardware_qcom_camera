@@ -23,6 +23,8 @@
 #include <cutils/properties.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <string.h>
+#include <dlfcn.h>
 
 #include "QCameraHAL.h"
 #include "QCameraHWI.h"
@@ -318,6 +320,15 @@ QCameraHardwareInterface(int cameraId, int mode)
         return;
     }
     mCameraState = CAMERA_STATE_READY;
+    libdms = dlopen("libmorpho_moviesolid.so", RTLD_NOW);
+    if (libdms) {
+        ALOGV("Open MM camera DL libmorpho_moviesolid loaded at %p & %p ", libdms);
+        *(void **)&LINK_morpho_MovieSolid_Init = dlsym(libdms, "MovieSolid_Init");
+        *(void **)&LINK_morpho_MovieSolid_Function = dlsym(libdms, "MovieSolid_Function");
+        *(void **)&LINK_morpho_MovieSolid_Finalize = dlsym(libdms, "MovieSolid_Finailze");
+    }
+    else
+        ALOGE("failed to open libmorpho_moviesolid");
 
     if (hw_get_module(POWER_HARDWARE_MODULE_ID,
             (const hw_module_t **)&mPowerModule)) {
@@ -375,6 +386,11 @@ QCameraHardwareInterface::~QCameraHardwareInterface()
     if(mStreamSnap) {
         QCameraStream_Snapshot::deleteInstance (mStreamSnap);
         mStreamSnap = NULL;
+    }
+    if (libdms != NULL) {
+         dlclose(libdms);
+         libdms = NULL;
+         ALOGV("closed libmorpho_moviesolid.so");
     }
 
     if (mStreamLiveSnap){

@@ -282,6 +282,9 @@ void QCameraStream_record::stop()
 
   releaseEncodeBuffer();
 
+  if(mHalCamCtrl->mVideoStabilization)
+    mHalCamCtrl->LINK_morpho_MovieSolid_Finalize();
+
   mActive = false;
   ALOGV("%s: END", __func__);
 
@@ -319,6 +322,12 @@ status_t QCameraStream_record::processRecordFrame(void *data)
 {
     ALOGV("%s : BEGIN",__func__);
     mm_camera_ch_data_buf_t* frame = (mm_camera_ch_data_buf_t*) data;
+
+    if(mHalCamCtrl->mVideoStabilization)
+      mHalCamCtrl->LINK_morpho_MovieSolid_Function(
+        (void*)frame->video.video.frame->buffer + frame->video.video.frame->y_off,
+        (void*)frame->video.video.frame->buffer + frame->video.video.frame->cbcr_off
+      );
 
     Mutex::Autolock lock(mStopCallbackLock);
     if(!mActive) {
@@ -407,6 +416,9 @@ status_t QCameraStream_record::initEncodeBuffers()
   planes[0] = dim.video_frame_offset.mp[0].len;
   planes[1] = dim.video_frame_offset.mp[1].len;
   frame_len = dim.video_frame_offset.frame_len;
+
+  if(mHalCamCtrl->mVideoStabilization)
+    mHalCamCtrl->LINK_morpho_MovieSolid_Init(dim.video_height, dim.video_width);
 
   buf_cnt = VIDEO_BUFFER_COUNT;
   if(mHalCamCtrl->isLowPowerCamcorder()) {

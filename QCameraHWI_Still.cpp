@@ -1877,11 +1877,13 @@ status_t QCameraStream_Snapshot::receiveRawPicture(mm_camera_ch_data_buf_t* recv
             goto end;
         }
 
+        mStopCallbackLock.unlock();
         if(!mHalCamCtrl->mShutterSoundPlayed) {
             notifyShutter(&crop, true);
         }
         notifyShutter(&crop, false);
         mHalCamCtrl->mShutterSoundPlayed = false;
+        mStopCallbackLock.lock();
 
 
         if (rc != NO_ERROR)

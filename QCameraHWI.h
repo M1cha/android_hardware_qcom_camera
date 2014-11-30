@@ -865,6 +865,12 @@ private:
      int (*LINK_morpho_MovieSolid_Init)(int a, int b);
      int (*LINK_morpho_MovieSolid_Function)(void*, void*);
      int (*LINK_morpho_MovieSolid_Finalize)(void);
+
+     /* Used to show the process state of snapshot_jpeg_cb*/
+     Mutex                  mSnapJpegCbLock;
+     Condition              mSnapJpegCbWait;
+     bool                   mSnapJpegCbRunning;
+     bool                   mSnapCbDisabled;
 };
 
 }; // namespace android

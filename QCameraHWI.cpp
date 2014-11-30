@@ -214,7 +214,9 @@ QCameraHardwareInterface(int cameraId, int mode)
                     mRestartPreview(false),
                     mReleasedRecordingFrame(false),
                     mStateLiveshot(false),
-		    mSupportedFpsRanges(NULL),
+                    mSnapJpegCbRunning(false),
+                    mSnapCbDisabled(false),
+                    mSupportedFpsRanges(NULL),
                     mSupportedFpsRangesCount(0),
                     mPowerModule(0),
                     mChannelInterfaceMask(STREAM_IMAGE)
@@ -372,9 +374,11 @@ QCameraHardwareInterface::~QCameraHardwareInterface()
       mStatHeap.clear( );
       mStatHeap = NULL;
     }
+    /*First stop the polling threads*/
+    ALOGI("%s First stop the polling threads before deleting instances", __func__);
+    cam_ops_stop(mCameraId);
     /* Join the threads, complete operations and then delete
        the instances. */
-    cam_ops_close(mCameraId);
     if(mStreamDisplay){
         QCameraStream_preview::deleteInstance (mStreamDisplay);
         mStreamDisplay = NULL;
@@ -403,6 +407,8 @@ QCameraHardwareInterface::~QCameraHardwareInterface()
         mStreamRdi = NULL;
     }
 
+    /* Now close the camera after deleting all the instances */
+    cam_ops_close(mCameraId);
     pthread_mutex_destroy(&mAsyncCmdMutex);
     pthread_cond_destroy(&mAsyncCmdWait);
 
@@ -1608,6 +1614,19 @@ status_t QCameraHardwareInterface::cancelPictureInternal()
 {
     ALOGI("cancelPictureInternal: E");
     status_t ret = MM_CAMERA_OK;
+    // Do not need Snapshot callback to up layer any more
+    mSnapCbDisabled = true;
+    //we should make sure that snap_jpeg_cb has finished
+    if(mStreamSnap){
+        mSnapJpegCbLock.lock();
+        if(mSnapJpegCbRunning != false){
+            ALOGE("%s: wait snapshot_jpeg_cb() to finish.", __func__);
+            mSnapJpegCbWait.wait(mSnapJpegCbLock);
+            ALOGE("%s: finish waiting snapshot_jpeg_cb(). ", __func__);
+        }
+        mSnapJpegCbLock.unlock();
+    }
+    ALOGI("%s: mCameraState=%d.", __func__, mCameraState);
     if(mCameraState != CAMERA_STATE_READY) {
         if(mStreamSnap) {
             mStreamSnap->stop();
@@ -1754,6 +1773,23 @@ status_t  QCameraHardwareInterface::takePicture()
     uint32_t stream_info;
     int mNuberOfVFEOutputs = 0;
     Mutex::Autolock lock(mLock);
+
+    mSnapJpegCbLock.lock();
+    if(mSnapJpegCbRunning==true){ // This flag is set true in snapshot_jpeg_cb
+       ALOGE("%s: wait snapshot_jpeg_cb() to finish to proceed with the next take picture", __func__);
+       mSnapJpegCbWait.wait(mSnapJpegCbLock);
+       ALOGE("%s: finish waiting snapshot_jpeg_cb() ", __func__);
+    }
+    mSnapJpegCbLock.unlock();
+
+    // if we have liveSnapshot instance,
+    // we need to delete it here to release teh channel it acquires
+    if (NULL != mStreamLiveSnap) {
+      delete(mStreamLiveSnap);
+      mStreamLiveSnap = NULL;
+    }
+
+    mSnapCbDisabled = false;
 
     mStreamSnap->resetSnapshotCounters();
     switch(mPreviewState) {

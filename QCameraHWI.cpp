@@ -175,6 +175,7 @@ QCameraHardwareInterface(int cameraId, int mode)
                     mPreviewSizeCount(13),
                     mVideoSizeCount(0),
                     mAutoFocusRunning(false),
+                    mNeedToUnlockCaf(false),
                     mHasAutoFocusSupport(false),
                     mInitialized(false),
                     mIs3DModeOn(0),
@@ -1527,7 +1528,9 @@ status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app
      * We specifically need to call cancelAutoFocus to unlock CAF.
      * In that sense, AF is still running.*/
     isp3a_af_mode_t afMode = getAutoFocusMode(mParameters);
-    mAutoFocusRunning = (afMode == AF_MODE_CAF) ? true : false;
+    if (afMode == AF_MODE_CAF)
+        mNeedToUnlockCaf = true;
+    mAutoFocusRunning = false;
     mAutofocusLock.unlock();
 
 /************************************************************
@@ -1539,7 +1542,7 @@ status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app
     }
 
     /* update focus distances after autofocus is done */
-    if(updateFocusDistances() != NO_ERROR) {
+    if((*status != CAM_CTRL_FAILED) && updateFocusDistances() != NO_ERROR) {
        ALOGE("%s: updateFocusDistances failed for %d", __FUNCTION__, mFocusMode);
     }
 
@@ -1550,7 +1553,7 @@ status_t QCameraHardwareInterface::autoFocusEvent(cam_ctrl_status_t *status, app
       variables' validity will be under question*/
 
     if (mNotifyCb && ( mMsgEnabled & CAMERA_MSG_FOCUS)){
-      ALOGV("%s:Issuing callback to service",__func__);
+      ALOGV("%s:Issuing AF callback to service",__func__);
 
       /* "Accepted" status is not appropriate it should be used for
         initial cmd, event reporting should only give use SUCCESS/FAIL
@@ -1704,7 +1707,7 @@ void liveshot_callback(mm_camera_ch_data_buf_t *recvd_frame,
     }
 
 #if 1
-    ALOGE("Live Snapshot Enabled");
+    ALOGV("Live Snapshot Enabled");
     if (mNuberOfVFEOutputs == 1){
        frame->snapshot.main.frame = frame->def.frame;
        frame->snapshot.main.idx = frame->def.idx;
@@ -1732,7 +1735,7 @@ void liveshot_callback(mm_camera_ch_data_buf_t *recvd_frame,
     mJpegMaxSize = pme->mDimension.video_width * pme->mDimension.video_width * 1.5;
 
     ALOGE("Picture w = %d , h = %d, size = %d",dim.picture_width,dim.picture_height,mJpegMaxSize);
-     if (pme->mStreamLiveSnap){
+    if (pme->mStreamLiveSnap){
         ALOGE("%s:Deleting old Snapshot stream instance",__func__);
         QCameraStream_Snapshot::deleteInstance (pme->mStreamLiveSnap);
         pme->mStreamLiveSnap = NULL;
@@ -1762,7 +1765,8 @@ void liveshot_callback(mm_camera_ch_data_buf_t *recvd_frame,
     ALOGE(" BUF DONE FAILED");
   }
 #endif
-  ALOGE("%s: X", __func__);
+    pme->setCAFLockCancel();
+    ALOGV("%s: X", __func__);
 
 }
 
@@ -1990,6 +1994,8 @@ status_t QCameraHardwareInterface::autoFocus()
     bool status = true;
     isp3a_af_mode_t afMode = getAutoFocusMode(mParameters);
 
+    Mutex::Autolock afLock(mAutofocusLock);
+
     if(mAutoFocusRunning==true){
       ALOGV("%s:AF already running should not have got this call",__func__);
       return NO_ERROR;
@@ -2034,8 +2040,9 @@ status_t QCameraHardwareInterface::cancelAutoFocus()
 *************************************************************/
 
     mAutofocusLock.lock();
-    if(mAutoFocusRunning) {
-
+    if(mAutoFocusRunning || mNeedToUnlockCaf) {
+      ALOGV("%s:Af either running or CAF needs unlocking", __func__);
+      mNeedToUnlockCaf = false;
       mAutoFocusRunning = false;
       mAutofocusLock.unlock();
 

@@ -1518,6 +1518,11 @@ QCameraParameters& QCameraHardwareInterface::getParameters()
 {
     Mutex::Autolock lock(mLock);
     mParameters.set(QCameraParameters::KEY_FOCUS_DISTANCES, mFocusDistance.string());
+    const char *str = mParameters.get(QCameraParameters::KEY_SCENE_MODE);
+    if (mHasAutoFocusSupport && strcmp(str, "auto")) {
+        mParameters.set(QCameraParameters::KEY_FOCUS_MODE,
+                                        QCameraParameters::FOCUS_MODE_CONTINUOUS_PICTURE);
+    }
     return mParameters;
 }
 
@@ -2091,6 +2096,7 @@ status_t QCameraHardwareInterface::setFocusMode(const QCameraParameters& params)
 {
     const char *str = params.get(QCameraParameters::KEY_FOCUS_MODE);
     const char *prev_str = mParameters.get(QCameraParameters::KEY_FOCUS_MODE);
+    bool modesAreSame = strcmp(str, prev_str) == 0;
     ALOGV("%s",__func__);
     if (str != NULL) {
         ALOGV("Focus mode '%s', previous focus mode '%s' (cmp %d)",str, prev_str, strcmp(str, prev_str));
@@ -2114,6 +2120,17 @@ status_t QCameraHardwareInterface::setFocusMode(const QCameraParameters& params)
                return UNKNOWN_ERROR;
             }
             mParameters.set(QCameraParameters::KEY_FOCUS_DISTANCES, mFocusDistance.string());
+
+            // Do not set the AF state to 'not running';
+            // this prevents a bug where an autoFocus followed by a setParameters
+            // with the same exact focus mode resulting in dropping the autoFocusEvent
+            if(modesAreSame) {
+                ALOGV("AF mode unchanged (still '%s'); don't touch CAF", str);
+                return NO_ERROR;
+            } else {
+                ALOGV("AF made has changed to '%s'", str);
+            }
+
             if(mHasAutoFocusSupport){
                 bool ret = native_set_parms(MM_CAMERA_PARM_FOCUS_MODE,
                                       sizeof(value),
@@ -2127,6 +2144,13 @@ status_t QCameraHardwareInterface::setFocusMode(const QCameraParameters& params)
 
 
                 ALOGV("Continuous Auto Focus %d", cafSupport);
+                if(mAutoFocusRunning && cafSupport){
+                  ALOGV("Set auto focus running to false");
+                  mAutoFocusRunning = false;
+                  if(MM_CAMERA_OK!=cam_ops_action(mCameraId,false,MM_CAMERA_OPS_FOCUS,NULL )) {
+                    ALOGE("%s: AF command failed err:%d error %s",__func__, errno,strerror(errno));
+                  }
+                }
                 ret = native_set_parms(MM_CAMERA_PARM_CONTINUOUS_AF, sizeof(cafSupport),
                                        (void *)&cafSupport);
             }
@@ -4443,6 +4467,20 @@ status_t QCameraHardwareInterface::setNoDisplayMode(const QCameraParameters& par
         mNoDisplayMode = prop_val;
         ALOGV("prop mNoDisplayMode =%d", mNoDisplayMode);
     }
+    return NO_ERROR;
+}
+
+status_t QCameraHardwareInterface::setCAFLockCancel(void)
+{
+    ALOGV("%s : E", __func__);
+
+    //for CAF unlock
+    if(MM_CAMERA_OK!=cam_ops_action(mCameraId,false,MM_CAMERA_OPS_FOCUS,NULL )) {
+        ALOGE("%s: AF command failed err:%d error %s",__func__, errno,strerror(errno));
+        return -1;
+    }
+
+    ALOGV("%s : X", __func__);
     return NO_ERROR;
 }
 

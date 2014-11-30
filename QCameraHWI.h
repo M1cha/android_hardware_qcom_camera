@@ -631,6 +631,7 @@ private:
     void takePicturePrepareHardware( );
     status_t setChannelInterfaceMask(const CameraParameters& params);
     status_t setNoDisplayMode(const QCameraParameters& params);
+    status_t setCAFLockCancel(void);
     status_t setMovieSolid(const QCameraParameters& params);
 
     isp3a_af_mode_t getAutoFocusMode(const QCameraParameters& params);
@@ -736,6 +737,7 @@ private:
     unsigned int mVideoSizeCount;
 
     bool mAutoFocusRunning;
+    bool mNeedToUnlockCaf;
     bool mMultiTouch;
     bool mHasAutoFocusSupport;
     bool mInitialized;

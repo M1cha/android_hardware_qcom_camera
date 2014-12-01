@@ -217,8 +217,6 @@ QCameraHardwareInterface(int cameraId, int mode)
                     mStateLiveshot(false),
                     mSnapJpegCbRunning(false),
                     mSnapCbDisabled(false),
-                    mSupportedFpsRanges(NULL),
-                    mSupportedFpsRangesCount(0),
                     mPowerModule(0),
                     mChannelInterfaceMask(STREAM_IMAGE)
 {
@@ -365,9 +363,6 @@ QCameraHardwareInterface::~QCameraHardwareInterface()
         break;
     }
     mPreviewState = QCAMERA_HAL_PREVIEW_STOPPED;
-
-    if(mSupportedFpsRanges != NULL)
-        delete mSupportedFpsRanges;
 
     freePictureTable();
     freeVideoSizeTable();
@@ -674,16 +669,6 @@ QCameraHAL_openCameraHardware(int  cameraId, int mode)
     ALOGV("QCameraHAL_openCameraHardware: E");
     return (void *) QCameraHardwareInterface::createInstance(cameraId, mode);
 }
-
-#if 0
-bool QCameraHardwareInterface::useOverlay(void)
-{
-    ALOGV("useOverlay: E");
-    mUseOverlay = true;
-    ALOGV("useOverlay: X");
-    return mUseOverlay;
-}
-#endif
 
 bool QCameraHardwareInterface::isPreviewRunning() {
     ALOGV("isPreviewRunning: E");
@@ -1043,7 +1028,7 @@ bool QCameraHardwareInterface::preview_parm_config (cam_ctrl_dimension_t* dim,
     if(value != NOT_FOUND && value != dim->prev_format ) {
         //Setting to Parameter requested by the Upper layer
         dim->prev_format = value;
-    }else if (value == NOT_FOUND){
+    } else if (value == NOT_FOUND) {
         //Setting to default Format.
         dim->prev_format = CAMERA_YUV_420_NV21;
     }
@@ -1368,7 +1353,7 @@ status_t QCameraHardwareInterface::startRecording()
         ret = UNKNOWN_ERROR;
         break;
     case QCAMERA_HAL_PREVIEW_STARTED:
-         //remember recordinghint value set by app
+        //remember recordinghint value set by app
         mAppRecordingHint = mRecordingHint;
         if (mRecordingHint == false || mRestartPreview) {
             ALOGE("%s: start recording when hint is false, stop preview first", __func__);
@@ -1706,7 +1691,6 @@ void liveshot_callback(mm_camera_ch_data_buf_t *recvd_frame,
         ALOGE("%s: X", __func__);
     }
 
-#if 1
     ALOGV("Live Snapshot Enabled");
     if (mNuberOfVFEOutputs == 1){
        frame->snapshot.main.frame = frame->def.frame;
@@ -1734,7 +1718,7 @@ void liveshot_callback(mm_camera_ch_data_buf_t *recvd_frame,
 
     mJpegMaxSize = pme->mDimension.video_width * pme->mDimension.video_width * 1.5;
 
-    ALOGE("Picture w = %d , h = %d, size = %d",dim.picture_width,dim.picture_height,mJpegMaxSize);
+    ALOGV("Picture w = %d , h = %d, size = %d",dim.picture_width,dim.picture_height,mJpegMaxSize);
     if (pme->mStreamLiveSnap){
         ALOGE("%s:Deleting old Snapshot stream instance",__func__);
         QCameraStream_Snapshot::deleteInstance (pme->mStreamLiveSnap);
@@ -1751,20 +1735,13 @@ void liveshot_callback(mm_camera_ch_data_buf_t *recvd_frame,
     pme->mStreamLiveSnap->setModeLiveSnapshot(true);
     pme->mStreamLiveSnap->setHALCameraControl(pme);
     pme->mStreamLiveSnap->initSnapshotBuffers(&dim,1);
-    ALOGE("Calling live shot");
+    ALOGV("Calling live shot");
 
-
-    ((QCameraStream_Snapshot*)(pme->mStreamLiveSnap))->takePictureLiveshot(frame,&dim,mJpegMaxSize);
-
-#else
-
-
-
-
-  if(MM_CAMERA_OK != cam_evt_buf_done(pme->mCameraId,frame )) {
-    ALOGE(" BUF DONE FAILED");
-  }
-#endif
+    ret = ((QCameraStream_Snapshot*)(pme->mStreamLiveSnap))->takePictureLiveshot(frame,&dim,mJpegMaxSize);
+    if (MM_CAMERA_OK != ret) {
+        ALOGE("%s: Error : returned from takePictureLiveshot",__func__);
+        return;
+    }
     pme->setCAFLockCancel();
     ALOGV("%s: X", __func__);
 
@@ -2256,13 +2233,16 @@ void QCameraHardwareInterface::zoomEvent(cam_ctrl_status_t *status, app_notify_c
 void QCameraHardwareInterface::dumpFrameToFile(const void * data, uint32_t size, char* name, char* ext, int index)
 {
 #if 0
-    char buf[32];
-    int file_fd;
+    char buf[32], value[PROPERTY_VALUE_MAX];
+    int file_fd, enabled = 0;
     static int i = 0 ;
-    if ( data != NULL) {
+    property_get("persist.camera.dumpimage", value, "0");
+    enabled = atoi(value);
+
+    if ( data != NULL && enabled) {
         char * str;
-        snprintf(buf, sizeof(buf), "/data/%s_%d.%s", name, index + i, ext);
-        ALOGE("marvin, %s size =%d", buf, size);
+        snprintf(buf, sizeof(buf), "/data/%s_%d.%s", name, index, ext);
+        ALOGE("%s size =%d", buf, size);
         file_fd = open(buf, O_RDWR | O_CREAT, 0777);
         write(file_fd, data, size);
         close(file_fd);
@@ -2820,4 +2800,3 @@ void QCameraHardwareInterface::pausePreviewForZSL()
     }
 }
 }; // namespace android
-

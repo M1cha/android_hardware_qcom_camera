@@ -1025,6 +1025,7 @@ status_t QCameraStream_preview::processPreviewFrameWithDisplay(
             pcb(msgType, data, 0, metadata, mHalCamCtrl->mCallbackCookie);
           if (previewMem)
               previewMem->release(previewMem);
+          mStopCallbackLock.lock();
       }
 	  ALOGV("end of cb");
   } else {
@@ -1045,6 +1046,7 @@ status_t QCameraStream_preview::processPreviewFrameWithDisplay(
               rcb(timeStamp, CAMERA_MSG_VIDEO_FRAME,
                       mHalCamCtrl->mRecordingMemory.metadata_memory[frame->def.idx],
                       0, mHalCamCtrl->mCallbackCookie);
+              mStopCallbackLock.lock();
           }else
               flagwait = 0;
       }
@@ -1054,6 +1056,7 @@ status_t QCameraStream_preview::processPreviewFrameWithDisplay(
               rcb(timeStamp, CAMERA_MSG_VIDEO_FRAME,
                       mHalCamCtrl->mPreviewMemory.camera_memory[frame->def.idx],
                       0, mHalCamCtrl->mCallbackCookie);
+              mStopCallbackLock.lock();
       }
 
       if(flagwait){
@@ -1164,6 +1167,7 @@ status_t QCameraStream_preview::processPreviewFrameWithOutDisplay(
             pcb(msgType, data, 0, metadata, mHalCamCtrl->mCallbackCookie);
           if (previewMem)
               previewMem->release(previewMem);
+          mStopCallbackLock.lock();
       }
 
       if(MM_CAMERA_OK != cam_evt_buf_done(mCameraId, &mNotifyBuffer[frame->def.idx])) {

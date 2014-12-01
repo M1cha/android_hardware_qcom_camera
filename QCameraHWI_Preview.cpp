@@ -857,6 +857,11 @@ status_t QCameraStream_preview::processPreviewFrameWithDisplay(
   nsecs_t timeStamp = seconds_to_nanoseconds(frame->def.frame->ts.tv_sec) ;
   timeStamp += frame->def.frame->ts.tv_nsec;
 
+  if(mFirstFrameRcvd == false) {
+  mm_camera_util_profile("HAL: First preview frame received");
+  mFirstFrameRcvd = true;
+  }
+
   if (UNLIKELY(mHalCamCtrl->mDebugFps)) {
       mHalCamCtrl->debugShowPreviewFPS();
   }
@@ -1198,7 +1203,8 @@ QCameraStream_preview::
 QCameraStream_preview(int cameraId, camera_mode_t mode)
   : QCameraStream(cameraId,mode),
     mLastQueuedFrame(NULL),
-    mNumFDRcvd(0)
+    mNumFDRcvd(0),
+    mFirstFrameRcvd(false)
   {
     mHalCamCtrl = NULL;
     ALOGV("%s: E", __func__);
@@ -1316,6 +1322,7 @@ status_t QCameraStream_preview::start()
 
     /* call mm_camera action start(...)  */
     ALOGV("Starting Preview/Video Stream. ");
+    mFirstFrameRcvd = false;
     ret = cam_ops_action(mCameraId, true, MM_CAMERA_OPS_PREVIEW, 0);
 
     if (MM_CAMERA_OK != ret) {

@@ -1249,6 +1249,7 @@ void QCameraHardwareInterface::stopPreview()
 {
     ALOGV("%s: stopPreview: E", __func__);
     Mutex::Autolock lock(mLock);
+    mm_camera_util_profile("HAL: stopPreview(): E");
     mFaceDetectOn = false;
 
     // reset recording hint to the value passed from Apps

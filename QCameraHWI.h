@@ -759,6 +759,7 @@ private:
     int mSnapshotFormat;
     int mZslInterval;
     bool mRestartPreview;
+    bool isCameraOpen;
     bool mVideoStabilization;
 
 /*for histogram*/

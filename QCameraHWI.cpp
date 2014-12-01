@@ -215,6 +215,7 @@ QCameraHardwareInterface(int cameraId, int mode)
                     mRestartPreview(false),
                     mReleasedRecordingFrame(false),
                     mStateLiveshot(false),
+                    isCameraOpen(false),
                     mSnapJpegCbRunning(false),
                     mSnapCbDisabled(false),
                     mPowerModule(0),
@@ -287,6 +288,7 @@ QCameraHardwareInterface(int cameraId, int mode)
       ALOGV(" %d  %d", mVideoSizes[i].width, mVideoSizes[i].height);
     }
 
+    isCameraOpen = true;
     /* set my mode - update myMode member variable due to difference in
      enum definition between upper and lower layer*/
     setMyMode(mode);
@@ -364,11 +366,13 @@ QCameraHardwareInterface::~QCameraHardwareInterface()
     }
     mPreviewState = QCAMERA_HAL_PREVIEW_STOPPED;
 
-    freePictureTable();
-    freeVideoSizeTable();
-    if(mStatHeap != NULL) {
-      mStatHeap.clear( );
-      mStatHeap = NULL;
+    if (isCameraOpen) {
+        freePictureTable();
+        freeVideoSizeTable();
+        if(mStatHeap != NULL) {
+          mStatHeap.clear( );
+          mStatHeap = NULL;
+        }
     }
     /*First stop the polling threads*/
     ALOGI("%s First stop the polling threads before deleting instances", __func__);
@@ -407,6 +411,7 @@ QCameraHardwareInterface::~QCameraHardwareInterface()
     cam_ops_close(mCameraId);
     pthread_mutex_destroy(&mAsyncCmdMutex);
     pthread_cond_destroy(&mAsyncCmdWait);
+    isCameraOpen = false;
 
     ALOGV("~QCameraHardwareInterface: X");
 }
